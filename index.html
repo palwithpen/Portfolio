@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pallav Gupta Platform Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1419;
+    --bg-raised:#161D24;
+    --bg-card:#131A20;
+    --line:#26313A;
+    --line-soft:#1C262E;
+    --text:#E8E6E1;
+    --text-dim:#8B98A3;
+    --text-faint:#5A6770;
+    --teal:#5EEAD4;
+    --teal-dim:#2D4A47;
+    --amber:#D4A056;
+    --red-dot:#E8645A;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--teal-dim);color:var(--teal);}
+
+  /* subtle grid texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.35;
+    pointer-events:none;
+    z-index:0;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 70%);
+  }
+
+  .wrap{max-width:920px;margin:0 auto;padding:0 32px;position:relative;z-index:1;}
+
+  /* ===== Eyebrow / mono labels ===== */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--teal);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 8px var(--teal);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.35;}
+  }
+
+  /* ===== NAV ===== */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(15,20,25,0.85);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:64px;
+  }
+  .nav-brand{
+    font-family:var(--mono); font-weight:600; font-size:14px;
+    color:var(--text);
+    display:flex; align-items:center; gap:10px;
+  }
+  .nav-brand .glyph{
+    width:26px;height:26px;border-radius:6px;
+    background:linear-gradient(135deg, var(--teal), var(--amber));
+    display:flex;align-items:center;justify-content:center;
+    color:#0F1419; font-weight:800; font-size:13px;
+  }
+  .nav-links{display:flex; gap:32px; font-family:var(--mono); font-size:13px; color:var(--text-dim);}
+  .nav-links a{transition:color .2s;}
+  .nav-links a:hover{color:var(--teal);}
+  .nav-cta{
+    font-family:var(--mono); font-size:12px;
+    border:1px solid var(--line); padding:8px 16px; border-radius:6px;
+    color:var(--text); transition:all .2s;
+  }
+  .nav-cta:hover{border-color:var(--teal); color:var(--teal);}
+  @media (max-width:720px){ .nav-links{display:none;} }
+
+  /* ===== HERO ===== */
+  header.hero{padding:96px 0 72px;}
+  .status-bar{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+    margin-bottom:40px;
+  }
+  .status-bar .seg{display:flex;align-items:center;gap:6px;}
+  .status-bar .sep{color:var(--line);}
+  .status-ok{color:var(--teal);}
+
+  h1.name{
+    font-family:var(--sans);
+    font-weight:800;
+    font-size:clamp(40px, 7vw, 68px);
+    line-height:1.04;
+    letter-spacing:-0.02em;
+    color:var(--text);
+    margin-bottom:18px;
+  }
+  h1.name .accent{
+    background:linear-gradient(90deg, var(--teal), #8FE9DA);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .role-line{
+    font-family:var(--mono);
+    font-size:17px;
+    color:var(--text-dim);
+    margin-bottom:32px;
+  }
+  .role-line .pipe{color:var(--line);margin:0 10px;}
+
+  .hero-desc{
+    max-width:600px;
+    color:var(--text-dim);
+    font-size:16.5px;
+    margin-bottom:40px;
+  }
+  .hero-desc strong{color:var(--text); font-weight:600;}
+
+  .hero-actions{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:56px;}
+  .btn{
+    font-family:var(--mono); font-size:13px; font-weight:500;
+    padding:13px 22px; border-radius:8px;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:all .2s;
+  }
+  .btn-primary{
+    background:var(--teal); color:#0A1512;
+    box-shadow:0 0 0 0 rgba(94,234,212,0.4);
+  }
+  .btn-primary:hover{ box-shadow:0 0 24px rgba(94,234,212,0.35); transform:translateY(-1px); }
+  .btn-secondary{
+    border:1px solid var(--line); color:var(--text);
+  }
+  .btn-secondary:hover{border-color:var(--text-dim); background:var(--bg-raised);}
+
+  /* metric strip */
+  .metric-strip{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; background:var(--bg-card);
+  }
+  .metric{
+    padding:22px 20px;
+    border-right:1px solid var(--line);
+  }
+  .metric:last-child{border-right:none;}
+  .metric .num{
+    font-family:var(--mono); font-weight:700; font-size:26px; color:var(--teal);
+    display:block; margin-bottom:4px;
+  }
+  .metric .label{font-size:12.5px; color:var(--text-faint);}
+  @media (max-width:640px){
+    .metric-strip{grid-template-columns:1fr 1fr;}
+    .metric{border-bottom:1px solid var(--line);}
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  section{padding:88px 0;}
+  section.tight{padding:64px 0;}
+  .sec-head{margin-bottom:48px;}
+  .sec-head .eyebrow{margin-bottom:14px;}
+  .sec-head h2{
+    font-family:var(--sans); font-weight:800; font-size:clamp(28px,4vw,38px);
+    letter-spacing:-0.01em;
+  }
+  .sec-head p{color:var(--text-dim); margin-top:10px; max-width:560px; font-size:15.5px;}
+  .rule{border:none; border-top:1px solid var(--line);}
+
+  /* ===== EXPERIENCE "services" dashboard cards ===== */
+  .service-card{
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--bg-card);
+    margin-bottom:20px;
+    overflow:hidden;
+    transition:border-color .25s;
+  }
+  .service-card:hover{border-color:#34424D;}
+  .service-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 26px;
+    border-bottom:1px solid var(--line-soft);
+    flex-wrap:wrap; gap:12px;
+  }
+  .service-id{display:flex; align-items:center; gap:16px;}
+  .logo-slot{
+    width:48px; height:48px; border-radius:10px;
+    background:var(--bg-raised);
+    border:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:9px; color:var(--text-faint);
+    text-align:center; line-height:1.3; flex-shrink:0;
+  }
+  .svc-meta .company{font-weight:700; font-size:17px; color:var(--text);}
+  .svc-meta .role{font-family:var(--mono); font-size:12.5px; color:var(--teal); margin-top:2px;}
+  .svc-status{
+    display:flex; align-items:center; gap:18px;
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+  }
+  .badge-live{
+    display:flex; align-items:center; gap:6px;
+    color:var(--teal); border:1px solid var(--teal-dim);
+    padding:4px 10px; border-radius:20px; background:rgba(94,234,212,0.06);
+  }
+  .badge-live .dot{width:5px;height:5px;border-radius:50%;background:var(--teal); animation:pulse 2.4s ease-in-out infinite;}
+  .svc-body{padding:24px 26px 26px;}
+  .svc-loc{font-family:var(--mono); font-size:12px; color:var(--text-faint); margin-bottom:16px;}
+
+  .project-block{margin-bottom:20px;}
+  .project-block:last-child{margin-bottom:0;}
+  .project-title{
+    font-weight:700; font-size:15.5px; color:var(--text); margin-bottom:6px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .project-title::before{content:"›"; color:var(--amber); font-family:var(--mono);}
+  .stack-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .tag{
+    font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
+    background:var(--bg-raised); border:1px solid var(--line-soft);
+    padding:3px 9px; border-radius:5px;
+  }
+  ul.bullets{list-style:none;}
+  ul.bullets li{
+    position:relative; padding-left:20px; margin-bottom:9px;
+    font-size:14.5px; color:var(--text-dim); line-height:1.6;
+  }
+  ul.bullets li::before{
+    content:"▸"; position:absolute; left:0; color:var(--teal); font-size:12px; top:3px;
+  }
+  ul.bullets li strong{color:var(--text); font-weight:600;}
+
+  /* ===== SKILLS ===== */
+  .skill-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  @media (max-width:760px){.skill-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:480px){.skill-grid{grid-template-columns:1fr;}}
+  .skill-card{
+    border:1px solid var(--line); border-radius:12px; padding:20px;
+    background:var(--bg-card);position:relative;transition:all .3s ease;
+  }
+  .skill-card:hover{border-color:var(--teal);box-shadow:0 0 0 1px rgba(94,234,212,.6),0 0 12px rgba(94,234,212,.25);}
+  .logo-slot img{max-width:80%;max-height:80%;object-fit:contain;}
+  .reveal{opacity:0;transform:translateY(30px);transition:all .7s ease;}
+  .reveal.visible{opacity:1;transform:none;}
+  .skill-card .cat{
+    font-family:var(--mono); font-size:11px; color:var(--amber);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;
+  }
+  .skill-card .items{font-size:13.5px; color:var(--text-dim); line-height:1.8;}
+
+  /* ===== EDUCATION + CERTS ===== */
+  .info-row{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:20px 0; border-bottom:1px solid var(--line-soft); gap:20px; flex-wrap:wrap;
+  }
+  .info-row:last-child{border-bottom:none;}
+  .info-row .left strong{font-size:15.5px; color:var(--text); display:block; margin-bottom:4px;}
+  .info-row .left span{font-size:13.5px; color:var(--text-dim);}
+  .info-row .right{font-family:var(--mono); font-size:12px; color:var(--text-faint); white-space:nowrap;}
+  .pill-progress{
+    font-family:var(--mono); font-size:10.5px; color:var(--amber);
+    border:1px solid #4A3B22; background:rgba(212,160,86,0.08);
+    padding:3px 9px; border-radius:20px; margin-left:8px;
+  }
+
+  /* ===== CONTACT / FOOTER ===== */
+  .contact-panel{
+    border:1px solid var(--line); border-radius:16px;
+    background:linear-gradient(180deg, var(--bg-card), var(--bg-raised));
+    padding:56px 48px; text-align:center;
+  }
+  .contact-panel h2{font-size:clamp(26px,4vw,36px); font-weight:800; margin-bottom:14px;}
+  .contact-panel p{color:var(--text-dim); max-width:480px; margin:0 auto 32px;}
+  .contact-links{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+
+  footer{padding:40px 0 60px; text-align:center;}
+  footer p{font-family:var(--mono); font-size:11.5px; color:var(--text-faint);}
+
+  @media (max-width:600px){
+    .wrap{padding:0 20px;}
+    .svc-status{width:100%; justify-content:space-between;}
+    .contact-panel{padding:40px 24px;}
+  }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{outline:2px solid var(--teal); outline-offset:3px; border-radius:4px;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand"><span class="glyph">PG</span> pallav@platform:~$</div>
+    <div class="nav-links">
+      <a href="#experience">experience</a>
+      <a href="#skills">skills</a>
+      <a href="#education">education</a>
+    </div>
+    <a class="nav-cta" href="#contact">contact_</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="status-bar">
+      <span class="seg"><span class="status-ok">●</span> all systems operational</span>
+      <span class="sep">/</span>
+      <span class="seg">uptime: 6+ years</span>
+      <span class="sep">/</span>
+      <span class="seg">region: bengaluru-in</span>
+    </div>
+
+    <h1 class="name">Pallav Gupta<br><span class="accent">builds platforms that don't go down.</span></h1>
+
+    <div class="role-line">
+      Senior Software Engineer <span class="pipe">|</span> Platform Engineer <span class="pipe">|</span> Distributed Systems
+    </div>
+
+    <p class="hero-desc">
+      Platform and distributed systems engineer with <strong>6+ years</strong> of end-to-end ownership from architecture to production across telecom, AI, and enterprise domains. I design event-driven microservices and run them on Kubernetes at the edge, where latency and reliability actually matter.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#contact">Get in touch →</a>
+      <a class="btn btn-secondary" href="#experience">View experience</a>
+      <a class="btn btn-secondary" href="Pallav_Gupta_Resume.pdf" download>Download résumé</a>
+    </div>
+
+    <div class="metric-strip">
+      <div class="metric reveal"><span class="num">6+</span><span class="label">years in production systems</span></div>
+      <div class="metric reveal"><span class="num">40%</span><span class="label">latency reduction shipped</span></div>
+      <div class="metric reveal"><span class="num">4×</span><span class="label">edge device throughput gain</span></div>
+      <div class="metric reveal"><span class="num">4</span><span class="label">companies, zero gaps</span></div>
+    </div>
+  </div>
+</header>
+
+<hr class="rule">
+
+<!-- ================= EXPERIENCE ================= -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="dot"></span> running services</div>
+      <h2>Professional Experience</h2>
+      <p>Each role below, treated like a service in production what it runs on, and what it shipped.</p>
+    </div>
+
+    <!-- HCL -->
+    <div class="service-card reveal">
+      <div class="service-head">
+        <div class="service-id">
+          <!-- <div class="logo-slot"><img src="images/hcl.png" alt="HCL Logo"></div> -->
+          <div class="svc-meta">
+            <div class="company">HCL Software</div>
+            <div class="role">Senior Software Engineer 2</div>
+          </div>
+        </div>
+        <div class="svc-status">
+          <span class="badge-live"><span class="dot"></span> current</span>
+          <span>Apr 2026 present</span>
+        </div>
+      </div>
+      <div class="svc-body">
+        <div class="svc-loc">📍 Bengaluru, IN</div>
+        <div class="project-block">
+          <div class="project-title">Augmented Network Automation</div>
+          <div class="stack-tags">
+            <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">ClickHouse</span>
+            <span class="tag">MQTT</span><span class="tag">ZeroMQ</span><span class="tag">Docker</span>
+            <span class="tag">Helm</span><span class="tag">K3S</span><span class="tag">HTTP/2</span>
+          </div>
+          <ul class="bullets">
+            <li>Owned migration of source repositories from Bitbucket to GitLab for a <strong>75+ engineer team</strong>, maintaining zero disruption to CI/CD pipelines.</li>
+            <li>Led database modernization migrating the persistence layer from ClickHouse to MongoDB, building new ORM integrations for improved query flexibility.</li>
+            <li>Designed and deployed containerized cloud-native services on Kubernetes (K3S) using Helm charts, improving deployment repeatability across environments.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nokia -->
+    <div class="service-card reveal">
+      <div class="service-head">
+        <div class="service-id">
+          <!-- <div class="logo-slot"><img src="images/nokia.png" alt="Nokia Logo"></div> -->
+          <div class="svc-meta">
+            <div class="company">Nokia</div>
+            <div class="role">Platform Lead</div>
+          </div>
+        </div>
+        <div class="svc-status">
+          <span>Apr 2022 Apr 2026</span>
+        </div>
+      </div>
+      <div class="svc-body">
+        <div class="svc-loc">📍 Bengaluru, IN</div>
+
+        <div class="project-block">
+          <div class="project-title">Context-Aware AI Positioning Platform</div>
+          <div class="stack-tags">
+            <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">PostgreSQL</span>
+            <span class="tag">MQTT</span><span class="tag">ZeroMQ</span><span class="tag">Docker</span>
+            <span class="tag">Helm</span><span class="tag">K3S</span>
+          </div>
+          <ul class="bullets">
+            <li>Sole architect and tech lead took the platform from whiteboard to production, orchestrating multiple AI models for real-time context-aware positioning.</li>
+            <li>Architected an event-driven layer with MQTT and ZeroMQ, enabling low-latency interaction between distributed components at the edge.</li>
+            <li><strong>Reduced API latency by 40%</strong> and optimised throughput to support <strong>4× more camera streams</strong> per edge device.</li>
+          </ul>
+        </div>
+
+        <div class="project-block">
+          <div class="project-title">Application Management Platform</div>
+          <div class="stack-tags">
+            <span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">Spring Boot</span>
+            <span class="tag">ReactJS</span><span class="tag">PostgreSQL</span><span class="tag">ArgoCD</span>
+            <span class="tag">Kubernetes</span><span class="tag">Helm</span>
+          </div>
+          <ul class="bullets">
+            <li>Led a full-stack platform for application lifecycle management deployment, monitoring, and ops at enterprise scale.</li>
+            <li>Built a ReactJS management console as the unified operator interface across services.</li>
+            <li>Integrated Kubernetes, Helm, and ArgoCD into a GitOps pipeline, reducing manual deployment steps.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infosys -->
+    <div class="service-card reveal">
+      <div class="service-head">
+        <div class="service-id">
+          <!-- <div class="logo-slot"><img src="images/infosys.png" alt="Infosys Logo"></div> -->
+          <div class="svc-meta">
+            <div class="company">Infosys</div>
+            <div class="role">Associate Consultant</div>
+          </div>
+        </div>
+        <div class="svc-status">
+          <span>Dec 2021 Apr 2022 · contract</span>
+        </div>
+      </div>
+      <div class="svc-body">
+        <div class="svc-loc">📍 Bengaluru, IN</div>
+        <div class="project-block">
+          <div class="project-title">Common Authentication System</div>
+          <div class="stack-tags">
+            <span class="tag">ReactJS</span><span class="tag">Node.js</span><span class="tag">NestJS</span>
+            <span class="tag">MongoDB</span><span class="tag">Apache</span>
+          </div>
+          <ul class="bullets">
+            <li>Built a centralised authentication platform as a reusable plugin for enterprise applications.</li>
+            <li>Migrated core services from Express.js to NestJS for improved modularity and maintainability.</li>
+            <li>Configured Apache for routing, load balancing, and secure SSL termination.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TCS -->
+    <div class="service-card reveal">
+      <div class="service-head">
+        <div class="service-id">
+          <!-- <div class="logo-slot"><img src="images/tcs.png" alt="TCS Logo"></div> -->
+          <div class="svc-meta">
+            <div class="company">Tata Consultancy Services</div>
+            <div class="role">Systems Engineer</div>
+          </div>
+        </div>
+        <div class="svc-status">
+          <span>Jul 2019 Dec 2021</span>
+        </div>
+      </div>
+      <div class="svc-body">
+        <div class="svc-loc">📍 Gandhinagar, IN</div>
+        <div class="project-block">
+          <div class="project-title">Telecom Solutions & Cloud Infrastructure</div>
+          <div class="stack-tags">
+            <span class="tag">Node.js</span><span class="tag">ReactJS</span><span class="tag">Spring Boot</span>
+            <span class="tag">Azure</span><span class="tag">PostgreSQL</span><span class="tag">Oracle DB</span>
+          </div>
+          <ul class="bullets">
+            <li>Built backend services and APIs for telecom customers across <strong>India and Europe</strong>.</li>
+            <li>Developed customer-facing apps and reusable ReactJS component libraries.</li>
+            <li>Managed deployment and scaling of infrastructure on Microsoft Azure, including secure VPN connectivity to on-prem environments.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ================= SKILLS ================= -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="dot"></span> dependency tree</div>
+      <h2>Technical Skills</h2>
+    </div>
+    <div class="skill-grid">
+      <div class="skill-card reveal">
+        <div class="cat">Languages</div>
+        <div class="items">Python · JavaScript (ES6+)<br>Java · Shell Scripting</div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="cat">Backend</div>
+        <div class="items">FastAPI · Flask · Node.js<br>Express.js · NestJS · Spring Boot</div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="cat">Frontend</div>
+        <div class="items">ReactJS · HTML5 · CSS3</div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="cat">Cloud &amp; DevOps</div>
+        <div class="items">Docker · Kubernetes · K3S<br>Helm · ArgoCD · Azure · Nginx</div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="cat">Messaging</div>
+        <div class="items">MQTT · ZeroMQ · HTTP/2<br>REST APIs · JWT Auth</div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="cat">Databases</div>
+        <div class="items">PostgreSQL · MariaDB<br>MongoDB · ClickHouse · Oracle</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ================= EDUCATION / CERTS =================
+<section id="education" class="tight">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="dot"></span> build history</div>
+      <h2>Education &amp; Certifications</h2>
+    </div>
+
+    <div class="info-row reveal">
+      <div class="left">
+        <strong>Madhav Institute of Technology and Science</strong>
+        <span>Bachelor of Engineering, Mechanical Engineering · CGPA 7.1 · Gwalior, IN</span>
+      </div>
+      <div class="right">2015 2019</div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule"> -->
+
+<!-- ================= CONTACT ================= -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-panel reveal">
+      <div class="eyebrow" style="justify-content:center; margin-bottom:18px;"><span class="dot"></span> open to opportunities</div>
+      <h2>Let's build something reliable.</h2>
+      <p>Open to Senior / Staff platform engineering roles. Reach out directly I usually reply within a day.</p>
+      <div class="contact-links">
+        <a class="btn btn-primary" href="mailto:palforwork2@gmail.com">palforwork2@gmail.com</a>
+        <a class="btn btn-secondary" href="https://www.linkedin.com/in/palwithpen/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="btn btn-secondary" href="https://github.com/palwithpen/" target="_blank" rel="noopener">GitHub ↗</a>
+        <a class="btn btn-secondary" href="tel:+917415172691">+91 7415172691</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>// built by Pallav Gupta last deployed June 2026</p>
+</footer>
+
+<script>const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");io.unobserve(e.target);}}),{threshold:.15});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));</script></body>
+</html>
