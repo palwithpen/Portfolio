@@ -24,37 +24,38 @@
   }
 
   /* ── CUSTOM CURSOR ─────────────────────────────────── */
-  *{ cursor:none !important; margin:0; padding:0; box-sizing:border-box; }
+  *, *::before, *::after { cursor:none !important; margin:0; padding:0; box-sizing:border-box; }
+  html, body { cursor:none !important; }
 
   #cursor-dot{
-    position:fixed; top:0; left:0; z-index:9999;
+    position:fixed; z-index:9999;
     width:8px; height:8px; border-radius:50%;
     background:var(--teal);
     box-shadow:0 0 8px 2px var(--teal), 0 0 20px 4px rgba(94,234,212,.45);
     pointer-events:none;
-    transform:translate(-50%,-50%);
-    transition:width .15s ease, height .15s ease, background .15s ease, box-shadow .15s ease;
-    will-change:transform;
+    /* position set via JS left/top — NO transform transition to avoid flicker */
+    transition:width .15s ease, height .15s ease, background .15s ease, box-shadow .15s ease, opacity .2s;
+    will-change:left,top;
+    top:-20px; left:-20px;
   }
   #cursor-ring{
-    position:fixed; top:0; left:0; z-index:9998;
+    position:fixed; z-index:9998;
     width:36px; height:36px; border-radius:50%;
     border:1.5px solid rgba(94,234,212,.5);
     pointer-events:none;
-    transform:translate(-50%,-50%);
-    transition:width .25s ease, height .25s ease, border-color .25s ease, opacity .2s ease;
-    will-change:transform;
+    transition:width .25s ease, height .25s ease, border-color .25s ease, box-shadow .25s ease, opacity .2s;
+    will-change:left,top;
     box-shadow:0 0 12px rgba(94,234,212,.15);
+    top:-40px; left:-40px;
   }
   #cursor-trail{
-    position:fixed; top:0; left:0; z-index:9997;
+    position:fixed; z-index:9997;
     width:60px; height:60px; border-radius:50%;
     background:radial-gradient(circle, rgba(94,234,212,.07) 0%, transparent 70%);
     pointer-events:none;
-    transform:translate(-50%,-50%);
-    will-change:transform;
+    will-change:left,top;
+    top:-60px; left:-60px;
   }
-  /* hover states pushed by JS class on body */
   body.cursor-hover #cursor-dot{
     width:14px; height:14px;
     background:var(--amber);
@@ -65,9 +66,7 @@
     border-color:rgba(212,160,86,.6);
     box-shadow:0 0 20px rgba(212,160,86,.25);
   }
-  body.cursor-click #cursor-dot{
-    transform:translate(-50%,-50%) scale(0.6);
-  }
+  body.cursor-click #cursor-dot{ opacity:.5; }
 
   /* ── BASE ──────────────────────────────────────────── */
   html{scroll-behavior:smooth;}
@@ -723,53 +722,544 @@ toggleAllBtn.addEventListener('click', () => {
 updateToggleBtn();
 
 /* ── CUSTOM GLOWING CURSOR ── */
-const dot   = document.getElementById('cursor-dot');
-const ring  = document.getElementById('cursor-ring');
-const trail = document.getElementById('cursor-trail');
+(function(){
+  const dot   = document.getElementById('cursor-dot');
+  const ring  = document.getElementById('cursor-ring');
+  const trail = document.getElementById('cursor-trail');
 
-let mx = -200, my = -200;
-let rx = -200, ry = -200;
-let tx = -200, ty = -200;
-let raf;
+  // Use left/top so the dot never lags — transform:translate was causing
+  // the browser to show the real cursor briefly on fast moves
+  let mx=0,my=0, rx=0,ry=0, tx=0,ty=0, started=false;
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
-});
+  function setPos(el, x, y, halfW, halfH){
+    el.style.left = (x - halfW) + 'px';
+    el.style.top  = (y - halfH) + 'px';
+  }
 
-function animateCursor(){
-  // Ring follows with slight lag
-  rx += (mx - rx) * 0.14;
-  ry += (my - ry) * 0.14;
-  ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    if(!started){ rx=mx; ry=my; tx=mx; ty=my; started=true; }
+    // Dot snaps instantly — zero lag guaranteed
+    setPos(dot, mx, my, 4, 4);
+  }, {passive:true});
 
-  // Trail follows even more slowly
-  tx += (mx - tx) * 0.06;
-  ty += (my - ty) * 0.06;
-  trail.style.transform = `translate(${tx}px,${ty}px) translate(-50%,-50%)`;
+  function animateCursor(){
+    rx += (mx - rx) * 0.16;
+    ry += (my - ry) * 0.16;
+    setPos(ring, rx, ry, 18, 18);
 
-  raf = requestAnimationFrame(animateCursor);
-}
-raf = requestAnimationFrame(animateCursor);
+    tx += (mx - tx) * 0.07;
+    ty += (my - ty) * 0.07;
+    setPos(trail, tx, ty, 30, 30);
 
-// Hover glow change on interactive elements
-const hoverTargets = 'a, button, [data-toggle], .skill-card, .btn, .nav-cta, .nav-links a';
-document.querySelectorAll(hoverTargets).forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-});
+    requestAnimationFrame(animateCursor);
+  }
+  requestAnimationFrame(animateCursor);
 
-// Click pulse
-document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+  // Hover state on interactive elements
+  const hoverTargets = 'a, button, [data-toggle], .skill-card, .btn, .nav-cta, .nav-links a';
+  document.querySelectorAll(hoverTargets).forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
 
-// Hide cursor when leaving window
-document.addEventListener('mouseleave', () => {
-  dot.style.opacity = '0'; ring.style.opacity = '0'; trail.style.opacity = '0';
-});
-document.addEventListener('mouseenter', () => {
-  dot.style.opacity = '1'; ring.style.opacity = '1'; trail.style.opacity = '1';
-});
+  document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+
+  // Fade out when mouse leaves page
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity='0'; ring.style.opacity='0'; trail.style.opacity='0';
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.style.opacity='1'; ring.style.opacity='1'; trail.style.opacity='1';
+  });
+})();
 </script>
+
+<!-- ███ TERMINAL LAUNCHER BUTTON ███ -->
+<button id="termBtn" title="Open terminal" aria-label="Open terminal">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <polyline points="4 17 10 11 4 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="12" y1="19" x2="20" y2="19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  </svg>
+  terminal_
+</button>
+
+<!-- ███ TERMINAL OVERLAY ███ -->
+<div id="termOverlay" role="dialog" aria-modal="true" aria-label="Terminal">
+  <div id="termWindow">
+    <div id="termTitleBar">
+      <span id="termTitle">pallav@portfolio:~$</span>
+      <button id="termClose" aria-label="Close terminal">&#x2715;</button>
+    </div>
+    <div id="termBody">
+      <div id="termOutput"></div>
+      <div id="termInputLine">
+        <span class="tprompt">pallav@portfolio:~$&nbsp;</span>
+        <input id="termInput" type="text" autocomplete="off" spellcheck="false" aria-label="Terminal input">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ███ PACMAN MODAL ███ -->
+<div id="pacModal" role="dialog" aria-modal="true" aria-label="Pac-Man Game">
+  <div id="pacWindow">
+    <div id="pacTitleBar">
+      <span>pacman v1.0 &mdash; arrow keys or WASD</span>
+      <button id="pacClose" aria-label="Close game">&#x2715;</button>
+    </div>
+    <div id="pacContent">
+      <canvas id="pacCanvas" width="420" height="420"></canvas>
+      <div id="pacHud">
+        <span>SCORE: <strong id="pacScore">0</strong></span>
+        <span>LIVES: <strong id="pacLives">3</strong></span>
+        <span id="pacMsg">Press ENTER to start</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+#termBtn{
+  position:fixed;bottom:28px;right:28px;z-index:1000;
+  background:#131A20;border:1px solid #26313A;
+  color:#5EEAD4;font-family:'JetBrains Mono',monospace;font-size:13px;
+  padding:11px 18px;border-radius:10px;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+  transition:border-color .2s,box-shadow .3s,transform .2s;
+}
+#termBtn:hover{border-color:#5EEAD4;box-shadow:0 0 20px rgba(94,234,212,.35);transform:translateY(-2px);}
+
+#termOverlay{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+}
+#termOverlay.open{display:flex;}
+
+#termWindow{
+  width:min(800px,96vw);height:min(500px,82vh);
+  background:#080f14;border:1px solid #26313A;border-radius:12px;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 0 60px rgba(94,234,212,.1),0 32px 80px rgba(0,0,0,.8);
+  animation:tSlide .22s ease;
+}
+@keyframes tSlide{from{opacity:0;transform:scale(.93) translateY(14px);}to{opacity:1;transform:none;}}
+
+#termTitleBar,#pacTitleBar{
+  background:#0e1820;border-bottom:1px solid #1C262E;
+  padding:10px 16px;display:flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A6770;
+}
+
+#termTitle{margin-left:6px;flex:1;}
+#pacTitleBar span:nth-child(4){margin-left:6px;flex:1;}
+
+#termClose,#pacClose{
+  background:transparent;border:none;color:#5A6770;
+  font-size:14px;padding:2px 6px;border-radius:4px;transition:color .15s;
+}
+#termClose:hover,#pacClose:hover{color:#E8E6E1;}
+
+#termBody{
+  flex:1;overflow-y:auto;padding:16px 18px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.75;
+  display:flex;flex-direction:column;
+}
+#termBody::-webkit-scrollbar{width:4px;}
+#termBody::-webkit-scrollbar-thumb{background:#26313A;border-radius:2px;}
+#termOutput{flex:1;white-space:pre-wrap;word-break:break-word;}
+#termInputLine{display:flex;align-items:center;margin-top:4px;}
+.tprompt{color:#5EEAD4;white-space:nowrap;}
+#termInput{
+  background:transparent;border:none;outline:none;color:#E8E6E1;
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  flex:1;caret-color:#5EEAD4;
+}
+.t-teal{color:#5EEAD4;}.t-amber{color:#D4A056;}.t-dim{color:#5A6770;}
+.t-red{color:#E8645A;}.t-white{color:#E8E6E1;}.t-bold{font-weight:700;}
+
+#pacModal{
+  display:none;position:fixed;inset:0;z-index:3000;
+  background:rgba(0,0,0,.78);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+}
+#pacModal.open{display:flex;}
+#pacWindow{
+  background:#080f14;border:1px solid #26313A;border-radius:12px;overflow:hidden;
+  box-shadow:0 0 60px rgba(212,160,86,.12),0 32px 80px rgba(0,0,0,.8);
+  animation:tSlide .22s ease;
+}
+#pacContent{display:flex;flex-direction:column;align-items:center;padding:16px;gap:12px;}
+#pacCanvas{border:1px solid #1C262E;border-radius:6px;display:block;}
+#pacHud{
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:#8B98A3;
+  display:flex;gap:28px;align-items:center;
+}
+#pacHud strong{color:#5EEAD4;}
+#pacMsg{color:#D4A056;}
+</style>
+
+<script>
+/* ── TERMINAL ── */
+(function(){
+  const btn=document.getElementById('termBtn');
+  const overlay=document.getElementById('termOverlay');
+  const closeBtn=document.getElementById('termClose');
+  const output=document.getElementById('termOutput');
+  const input=document.getElementById('termInput');
+
+  const BANNER=`<span class="t-teal t-bold">  ██████╗  █████╗ ██╗     ██╗      █████╗ ██╗   ██╗\n  ██╔══██╗██╔══██╗██║     ██║     ██╔══██╗██║   ██║\n  ██████╔╝███████║██║     ██║     ███████║██║   ██║\n  ██╔═══╝ ██╔══██║██║     ██║     ██╔══██║╚██╗ ██╔╝\n  ██║     ██║  ██║███████╗███████╗██║  ██║ ╚████╔╝ \n  ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝ </span>\n<span class="t-dim">  Platform Engineer Portfolio — Interactive Terminal v1.0\n  Type </span><span class="t-amber">help</span><span class="t-dim"> to see available commands.\n</span>`;
+
+  const CMDS={
+    help:()=>`<span class="t-amber t-bold">Available commands</span>\n  <span class="t-teal">whoami</span>           about Pallav\n  <span class="t-teal">skills</span>           tech stack\n  <span class="t-teal">experience</span>       career timeline\n  <span class="t-teal">contact</span>          get in touch\n  <span class="t-teal">stack</span>            favourite tools\n  <span class="t-teal">uptime</span>           years in the industry\n  <span class="t-teal">kubectl get pods</span> running services\n  <span class="t-teal">docker ps</span>        container list\n  <span class="t-teal">ls projects</span>      key projects\n  <span class="t-teal">cat readme</span>       fun facts\n  <span class="t-teal">pacman</span>           launch Pac-Man 🕹\n  <span class="t-teal">clear</span>            clear screen\n  <span class="t-teal">exit</span>             close terminal`,
+
+    whoami:()=>`<span class="t-white t-bold">Pallav Gupta</span>\n  Senior Software Engineer · Platform Lead\n  📍 Bengaluru, IN  |  6+ years shipping cloud-native platforms\n  🎓 B.E. Mechanical → self-taught software engineer\n  💼 HCL Software (current) · Nokia · Infosys · TCS`,
+
+    skills:()=>`<span class="t-amber t-bold">Tech Stack</span>\n  <span class="t-teal">Languages :</span> Python, JavaScript, Java, Shell\n  <span class="t-teal">Backend   :</span> FastAPI, Node.js, Express, NestJS, Spring Boot\n  <span class="t-teal">Frontend  :</span> ReactJS, HTML5, CSS3\n  <span class="t-teal">Cloud     :</span> Docker, Kubernetes, K3S, Helm, ArgoCD, Azure\n  <span class="t-teal">Messaging :</span> MQTT, ZeroMQ, HTTP/2, REST, JWT\n  <span class="t-teal">Databases :</span> PostgreSQL, MongoDB, ClickHouse, MariaDB, Oracle`,
+
+    experience:()=>`<span class="t-amber t-bold">Career Timeline</span>\n  <span class="t-teal">2026 → now </span> HCL Software — Sr. Software Engineer 2\n               Augmented Network Automation\n\n  <span class="t-teal">2022 → 2026</span> Nokia — Platform Lead\n               AI Positioning Platform\n               <span class="t-white">40% latency ↓  ·  4× edge throughput ↑</span>\n               Application Management Platform\n\n  <span class="t-teal">2021 → 2022</span> Infosys — Associate Consultant (contract)\n               Common Authentication System\n\n  <span class="t-teal">2019 → 2021</span> TCS — Systems Engineer\n               Telecom Solutions · India &amp; Europe`,
+
+    contact:()=>`<span class="t-amber t-bold">Contact</span>\n  📧  <span class="t-teal">palforwork2@gmail.com</span>\n  🔗  <span class="t-teal">linkedin.com/in/palwithpen</span>\n  🐙  <span class="t-teal">github.com/palwithpen</span>\n  📱  <span class="t-teal">+91 7415172691</span>`,
+
+    stack:()=>`<span class="t-amber t-bold">Daily toolkit</span>\n  Editor  : VS Code + Vim keybindings\n  Shell   : zsh + oh-my-zsh\n  OS      : Ubuntu / RHEL in prod, macOS for dev\n  Orch    : Kubernetes (K3S at the edge)\n  Msg     : MQTT for IoT, ZeroMQ for in-process\n  DB      : PostgreSQL first; MongoDB when schema is fluid`,
+
+    uptime:()=>{
+      const yrs=((Date.now()-new Date('2019-07-01'))/(1000*60*60*24*365.25)).toFixed(1);
+      return `<span class="t-teal t-bold">System uptime: ${yrs} years</span>\n  Started  : July 2019 (TCS)\n  Current  : HCL Software\n  Status   : <span class="t-teal">● all systems operational</span>`;
+    },
+
+    'kubectl get pods':()=>`<span class="t-amber">NAME                           READY  STATUS      RESTARTS</span>\n  hcl-augmented-network-auto     1/1    <span class="t-teal">Running</span>     0\n  nokia-ai-positioning-platform  1/1    <span class="t-teal">Running</span>     0\n  nokia-app-mgmt-platform        1/1    <span class="t-teal">Running</span>     0\n  infosys-auth-system            0/1    Completed   0\n  tcs-telecom-infra              0/1    Completed   0\n<span class="t-dim">  5 pods · 2 running · 3 completed</span>`,
+
+    'docker ps':()=>`<span class="t-amber">CONTAINER ID  IMAGE                    STATUS         PORTS</span>\n  a3f9c1b2e8d4  hcl/network-auto:latest  <span class="t-teal">Up 3 months</span>   8080/tcp\n  d5e7f2a1c9b3  nokia/ai-platform:2.4    <span class="t-teal">Up 4 years</span>    3000/tcp\n  7b8c3d4e5f6a  nokia/app-mgmt:1.7       <span class="t-teal">Up 4 years</span>    5000/tcp\n<span class="t-dim">  3 containers running</span>`,
+
+    'ls projects':()=>`<span class="t-amber">drwxr-xr-x  projects/</span>\n  ├── <span class="t-teal">ai-positioning-platform/</span>    Nokia · Python · FastAPI · K3S\n  ├── <span class="t-teal">app-mgmt-platform/</span>          Nokia · Node.js · ArgoCD · Kubernetes\n  ├── <span class="t-teal">augmented-network-auto/</span>     HCL  · Python · MQTT · MongoDB\n  └── <span class="t-teal">common-auth-system/</span>         Infosys · NestJS · MongoDB`,
+
+    'cat readme':()=>`<span class="t-amber t-bold">fun_facts.md</span>\n  - Transitioned from Mechanical Engg to Software in 2019\n  - Built and owned platforms from whiteboard → production\n  - Favourite command: <span class="t-teal">kubectl rollout status</span>\n  - 0 production outages caused (knock on wood 🤞)\n  - Achieved 40% latency reduction on edge AI platform\n  - Currently pursuing CKA certification`,
+
+    pacman:()=>{ setTimeout(()=>window.openPacMan(),80); return `<span class="t-amber">Launching Pac-Man...</span> 🕹`; },
+
+    clear:()=>{ output.innerHTML=''; return null; },
+    exit:()=>{ setTimeout(()=>closeTerminal(),120); return `<span class="t-dim">Closing terminal. Goodbye 👋</span>`; },
+  };
+
+  let hist=[],hIdx=-1;
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function print(h){ output.innerHTML+=h+'\n'; document.getElementById('termBody').scrollTop=99999; }
+
+  function run(raw){
+    const cmd=raw.trim().toLowerCase();
+    print(`<span class="t-teal">pallav@portfolio:~$</span> <span class="t-white">${esc(raw)}</span>`);
+    if(!cmd) return;
+    hist.unshift(raw); hIdx=-1;
+    const fn=CMDS[cmd];
+    if(fn){ const r=fn(); if(r!=null) print(r); }
+    else print(`<span class="t-red">command not found: ${esc(cmd)}</span>  (try <span class="t-amber">help</span>)`);
+  }
+
+  function openTerminal(){
+    overlay.classList.add('open');
+    output.innerHTML=BANNER;
+    input.value='';
+    setTimeout(()=>input.focus(),60);
+  }
+  function closeTerminal(){ overlay.classList.remove('open'); }
+
+  btn.addEventListener('click',openTerminal);
+  closeBtn.addEventListener('click',closeTerminal);
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) closeTerminal(); });
+
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){ const v=input.value; input.value=''; run(v); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); if(hIdx<hist.length-1){hIdx++;input.value=hist[hIdx];} }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); if(hIdx>0){hIdx--;input.value=hist[hIdx];}else{hIdx=-1;input.value='';} }
+    else if(e.key==='Tab'){ e.preventDefault(); const v=input.value.toLowerCase(); const m=Object.keys(CMDS).find(k=>k.startsWith(v)); if(m) input.value=m; }
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&overlay.classList.contains('open')) closeTerminal();
+  });
+})();
+
+/* ── PAC-MAN — fixed timestep + BFS ghost AI ── */
+(function(){
+  const modal=document.getElementById('pacModal');
+  const closeBtn=document.getElementById('pacClose');
+  const canvas=document.getElementById('pacCanvas');
+  const ctx=canvas.getContext('2d');
+  const scoreEl=document.getElementById('pacScore');
+  const livesEl=document.getElementById('pacLives');
+  const msgEl=document.getElementById('pacMsg');
+  const W=420,H=420,CELL=20,COLS=21,ROWS=21;
+
+  // Ghost step interval in ms — lower = faster
+  const PAC_MS   = 140;   // pac-man moves every 140ms
+  const GHOST_MS = [170, 190, 200, 220]; // each ghost has its own speed
+
+  const TPL=[
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,2,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,2,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,0,1],
+    [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+    [1,1,1,1,0,1,1,1,3,1,1,1,3,1,1,1,0,1,1,1,1],
+    [1,1,1,1,0,1,3,3,3,3,3,3,3,3,3,1,0,1,1,1,1],
+    [1,1,1,1,0,1,3,1,1,3,3,3,1,1,3,1,0,1,1,1,1],
+    [3,3,3,3,0,3,3,1,3,3,3,3,3,1,3,3,0,3,3,3,3],
+    [1,1,1,1,0,1,3,1,1,1,1,1,1,1,3,1,0,1,1,1,1],
+    [1,1,1,1,0,1,3,3,3,3,3,3,3,3,3,1,0,1,1,1,1],
+    [1,1,1,1,0,1,3,1,1,1,1,1,1,1,3,1,0,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,0,1],
+    [1,2,0,1,0,0,0,0,0,0,3,0,0,0,0,0,0,1,0,2,1],
+    [1,1,0,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,0,1,1],
+    [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  ];
+
+  const GC=['#E8645A','#FFB8FF','#00FFFF','#FFB852'];
+  const DIRS4=[[1,0],[-1,0],[0,1],[0,-1]];
+  let maze,score,lives,state,raf,pac,ghosts,dots;
+
+  // ── BFS: find next step from (sx,sy) toward (tx,ty) ──────────────────────
+  function bfsStep(sx,sy,tx,ty,avoidBack,bdx,bdy){
+    if(sx===tx&&sy===ty) return [0,0];
+    const key=(x,y)=>y*COLS+x;
+    const visited=new Set([key(sx,sy)]);
+    const queue=[[sx,sy,null]]; // [x,y,firstDir]
+    while(queue.length){
+      const [cx,cy,fd]=queue.shift();
+      for(const [dx,dy] of DIRS4){
+        // Don't go back on first step if avoidBack is set
+        if(avoidBack&&cx===sx&&cy===sy&&dx===bdx&&dy===bdy) continue;
+        const nx=(cx+dx+COLS)%COLS, ny=(cy+dy+ROWS)%ROWS;
+        if(maze[ny]?.[nx]===1) continue;
+        const k=key(nx,ny);
+        if(visited.has(k)) continue;
+        visited.add(k);
+        const firstDir=fd||[dx,dy];
+        if(nx===tx&&ny===ty) return firstDir;
+        queue.push([nx,ny,firstDir]);
+      }
+    }
+    // No path found — pick any valid direction
+    for(const [dx,dy] of DIRS4){
+      const nx=(sx+dx+COLS)%COLS,ny=(sy+dy+ROWS)%ROWS;
+      if(maze[ny]?.[nx]!==1) return [dx,dy];
+    }
+    return [0,0];
+  }
+
+  // ── Ghost target logic ─────────────────────────────────────────────────────
+  // Blinky (0): direct chase
+  // Pinky  (1): 4 tiles ahead of pac
+  // Inky   (2): scatter corners, then chase
+  // Clyde  (3): chase when far (>8), scatter to corner when close
+  function ghostTarget(g,idx){
+    if(g.fr) return null; // random when frightened
+    switch(idx){
+      case 0: return [pac.x,pac.y];
+      case 1: return [(pac.x+pac.dx*4+COLS)%COLS,(pac.y+pac.dy*4+ROWS)%ROWS];
+      case 2:{
+        const d=Math.hypot(g.x-pac.x,g.y-pac.y);
+        return d>5?[pac.x,pac.y]:[1,ROWS-2]; // scatter to bottom-left
+      }
+      case 3:{
+        const d=Math.hypot(g.x-pac.x,g.y-pac.y);
+        return d>8?[pac.x,pac.y]:[COLS-2,ROWS-2]; // scatter to bottom-right
+      }
+    }
+  }
+
+  function resetMaze(){
+    maze=TPL.map(r=>[...r]); dots=0;
+    maze.forEach(r=>r.forEach(c=>{if(c===0||c===2)dots++;}));
+  }
+
+  // Home release delays in real ms (not frames — stable across any frame rate)
+  const HOME_DELAY=[0,2500,4500,7000];
+
+  function init(){
+    resetMaze(); score=0; lives=3;
+    scoreEl.textContent=0; livesEl.textContent=3; msgEl.textContent='';
+    pac={x:10,y:15,dx:0,dy:0,nx:0,ny:0,frame:0,timer:0};
+    const now=performance.now();
+    ghosts=GC.map((c,i)=>({
+      x:[9,10,11,10][i], y:[9,9,9,8][i],
+      dx:[1,0,-1,0][i],  dy:[0,1,0,-1][i],
+      c, fr:false, ft:0,
+      home:true,
+      releaseAt: now + HOME_DELAY[i], // real-time release
+      timer: now + GHOST_MS[i],       // next move timestamp
+      ftTimer:0,
+    }));
+    state='waiting'; msgEl.textContent='Press ENTER to start';
+  }
+
+  function movePac(now){
+    if(now < pac.timer) return;
+    pac.timer = now + PAC_MS;
+    // Try queued direction first, then keep current
+    const tnx=(pac.x+pac.nx+COLS)%COLS, tny=(pac.y+pac.ny+ROWS)%ROWS;
+    if(maze[tny]?.[tnx]!==1){ pac.dx=pac.nx; pac.dy=pac.ny; }
+    const nx=(pac.x+pac.dx+COLS)%COLS, ny=(pac.y+pac.dy+ROWS)%ROWS;
+    if(maze[ny]?.[nx]!==1){ pac.x=nx; pac.y=ny; }
+    const v=maze[pac.y]?.[pac.x];
+    if(v===0){ maze[pac.y][pac.x]=3; score+=10; dots--; scoreEl.textContent=score; }
+    if(v===2){
+      maze[pac.y][pac.x]=3; score+=50; dots--; scoreEl.textContent=score;
+      const nt=performance.now();
+      ghosts.forEach(g=>{ if(!g.home){g.fr=true; g.ft=nt+5000;} });
+    }
+    if(dots<=0){ state='won'; msgEl.textContent='YOU WIN! 🎉 Press ENTER to replay'; }
+    pac.frame++;
+  }
+
+  function moveGhosts(now){
+    ghosts.forEach((g,i)=>{
+      // Home hold — use real elapsed time
+      if(g.home){
+        if(now < g.releaseAt) return;
+        g.home=false;
+      }
+      // Frightened timer
+      if(g.fr && now > g.ft){ g.fr=false; }
+      // Move on own interval
+      if(now < g.timer) return;
+      g.timer = now + (g.fr ? GHOST_MS[i]*1.4 : GHOST_MS[i]);
+      // Pick next step
+      let [ndx,ndy] = [0,0];
+      if(g.fr){
+        // Frightened: BFS away from pac (maximise distance)
+        const choices=DIRS4.filter(([dx,dy])=>{
+          const nx=(g.x+dx+COLS)%COLS,ny=(g.y+dy+ROWS)%ROWS;
+          return maze[ny]?.[nx]!==1 && !(dx===-g.dx&&dy===-g.dy);
+        });
+        if(!choices.length){
+          const all=DIRS4.filter(([dx,dy])=>maze[(g.y+dy+ROWS)%ROWS]?.[(g.x+dx+COLS)%COLS]!==1);
+          [ndx,ndy]=all[Math.floor(Math.random()*all.length)]||[0,0];
+        } else {
+          // Pick direction that moves furthest from pac
+          const best=choices.reduce((a,b)=>{
+            const da=(g.x+a[0]-pac.x)**2+(g.y+a[1]-pac.y)**2;
+            const db=(g.x+b[0]-pac.x)**2+(g.y+b[1]-pac.y)**2;
+            return da>db?a:b;
+          });
+          [ndx,ndy]=best;
+        }
+      } else {
+        const tgt=ghostTarget(g,i);
+        [ndx,ndy]=bfsStep(g.x,g.y,tgt[0],tgt[1],true,-g.dx,-g.dy);
+      }
+      g.dx=ndx; g.dy=ndy;
+      g.x=(g.x+g.dx+COLS)%COLS;
+      g.y=(g.y+g.dy+ROWS)%ROWS;
+    });
+  }
+
+  function checkCol(){
+    ghosts.forEach(g=>{
+      if(g.home) return;
+      if(g.x===pac.x&&g.y===pac.y){
+        if(g.fr){
+          g.fr=false; score+=200; scoreEl.textContent=score;
+          g.x=[9,10,11,10][ghosts.indexOf(g)]; g.y=9;
+          g.home=true; g.releaseAt=performance.now()+3000;
+        } else {
+          lives--; livesEl.textContent=lives;
+          if(lives<=0){ state='dead'; msgEl.textContent='GAME OVER 💀 Press ENTER to retry'; }
+          else{
+            pac.x=10;pac.y=15;pac.dx=0;pac.dy=0;pac.nx=0;pac.ny=0;
+            const now=performance.now();
+            ghosts.forEach((g,i)=>{ g.x=[9,10,11,10][i];g.y=9;g.home=true;g.releaseAt=now+HOME_DELAY[i];g.fr=false; });
+            state='waiting'; msgEl.textContent='Press ENTER to continue';
+          }
+        }
+      }
+    });
+  }
+
+  function draw(now){
+    ctx.fillStyle='#080f14'; ctx.fillRect(0,0,W,H);
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+      const v=maze[r][c],px=c*CELL,py=r*CELL;
+      if(v===1){
+        ctx.fillStyle='#112244';ctx.fillRect(px,py,CELL,CELL);
+        ctx.strokeStyle='#1a3a7a';ctx.lineWidth=1;ctx.strokeRect(px+.5,py+.5,CELL-1,CELL-1);
+      } else if(v===0){
+        ctx.fillStyle='#5EEAD4';ctx.beginPath();ctx.arc(px+CELL/2,py+CELL/2,2.2,0,Math.PI*2);ctx.fill();
+      } else if(v===2){
+        // Pulsing power pellet
+        const pulse=0.7+0.3*Math.sin(now*0.006);
+        ctx.fillStyle='#5EEAD4';ctx.shadowColor='#5EEAD4';ctx.shadowBlur=12*pulse;
+        ctx.beginPath();ctx.arc(px+CELL/2,py+CELL/2,5*pulse,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+      }
+    }
+    // Pac-Man
+    const ppx=pac.x*CELL+CELL/2,ppy=pac.y*CELL+CELL/2,pr=CELL/2-1;
+    const pangle=Math.atan2(pac.dy,pac.dx)||0;
+    const mouth=(Math.abs(Math.sin(pac.frame*0.22))*0.3+0.05)*Math.PI;
+    ctx.fillStyle='#FFD700';ctx.shadowColor='#FFD700';ctx.shadowBlur=10;
+    ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.arc(ppx,ppy,pr,pangle+mouth,pangle+Math.PI*2-mouth);ctx.closePath();ctx.fill();ctx.shadowBlur=0;
+    // Ghosts
+    ghosts.forEach(g=>{
+      if(g.home && now < g.releaseAt) return; // don't draw while in pen countdown
+      const gpx=g.x*CELL,gpy=g.y*CELL;
+      const flash=g.fr&&(g.ft-now)<1500&&Math.floor(now/250)%2===0;
+      const col=g.fr?(flash?'#E8E6E1':'#2563EB'):g.c;
+      ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=g.fr?4:10;
+      ctx.beginPath();
+      ctx.arc(gpx+CELL/2,gpy+CELL/2-1,CELL/2-1,Math.PI,0);
+      ctx.lineTo(gpx+CELL-1,gpy+CELL);
+      for(let i=0;i<3;i++) ctx.arc(gpx+CELL-1-(i*CELL/3+CELL/6),gpy+CELL,CELL/6,0,Math.PI,true);
+      ctx.lineTo(gpx+1,gpy+CELL);ctx.closePath();ctx.fill();ctx.shadowBlur=0;
+      if(!g.fr){
+        ctx.fillStyle='#fff';
+        ctx.beginPath();ctx.ellipse(gpx+CELL*.35,gpy+CELL*.38,2.8,3.5,-.3,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.ellipse(gpx+CELL*.65,gpy+CELL*.38,2.8,3.5,.3,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#001';
+        ctx.beginPath();ctx.arc(gpx+CELL*.38,gpy+CELL*.38,1.4,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.arc(gpx+CELL*.68,gpy+CELL*.38,1.4,0,Math.PI*2);ctx.fill();
+      }
+    });
+  }
+
+  function loop(now){
+    if(state==='running'){
+      movePac(now);
+      moveGhosts(now);
+      checkCol();
+    }
+    draw(now);
+    raf=requestAnimationFrame(loop);
+  }
+
+  const KMAP={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0],W:[0,-1],S:[0,1],A:[-1,0],D:[1,0]};
+  function onKey(e){
+    if(!modal.classList.contains('open')) return;
+    const d=KMAP[e.key];
+    if(d){e.preventDefault();pac.nx=d[0];pac.ny=d[1];}
+    if(e.key==='Enter'){
+      if(state==='waiting'){state='running';msgEl.textContent='';}
+      else if(state==='dead'||state==='won'){init();state='running';msgEl.textContent='';}
+    }
+    if(e.key==='Escape') close();
+  }
+  document.addEventListener('keydown',onKey);
+
+  function open(){ modal.classList.add('open'); init(); cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
+  function close(){ modal.classList.remove('open'); cancelAnimationFrame(raf); }
+
+  closeBtn.addEventListener('click',close);
+  modal.addEventListener('click',e=>{if(e.target===modal)close();});
+  window.openPacMan=open;
+})();
+</script>
+
 </body>
-</html>
