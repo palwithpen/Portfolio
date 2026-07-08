@@ -365,15 +365,150 @@
   footer{ padding:40px 0 60px; text-align:center; }
   footer p{ font-family:var(--mono); font-size:11.5px; color:var(--text-faint); }
 
-  @media(max-width:600px){
-    .wrap{padding:0 20px;}
-    .svc-right{width:100%; justify-content:space-between;}
-    .contact-panel{padding:40px 24px;}
-  }
+  /* ── FOCUS ─────────────────────────────────────── */
   a:focus-visible, button:focus-visible{ outline:2px solid var(--teal); outline-offset:3px; border-radius:4px; }
+
+  /* ── REDUCED MOTION ─────────────────────────────── */
   @media(prefers-reduced-motion:reduce){
     *{animation:none !important; transition:none !important;}
     #cursor-dot,#cursor-ring,#cursor-trail{display:none;}
+  }
+
+  /* ═══════════════════════════════════════
+     RESPONSIVE — TABLET  ≤ 768px
+  ═══════════════════════════════════════ */
+  @media(max-width:768px){
+    .wrap{ padding:0 24px; }
+
+    /* NAV */
+    .nav-links{ display:none; }
+
+    /* HERO */
+    header.hero{ padding:56px 0 48px; }
+    .status-bar{ flex-wrap:wrap; gap:6px; font-size:11px; }
+    .role-line{ font-size:14px; }
+    .role-line .pipe{ margin:0 6px; }
+    .hero-desc{ font-size:15px; }
+    .hero-actions{ gap:10px; }
+    .btn{ padding:11px 18px; font-size:12px; }
+
+    /* METRICS */
+    .metric-strip{ grid-template-columns:1fr 1fr; }
+    .metric{ border-bottom:1px solid var(--line); }
+    .metric:nth-child(odd){ border-right:1px solid var(--line); }
+    .metric:nth-child(even){ border-right:none; }
+    .metric:nth-last-child(-n+2){ border-bottom:none; }
+
+    /* SECTIONS */
+    section{ padding:60px 0; }
+    section.tight{ padding:48px 0; }
+
+    /* EXPERIENCE */
+    .exp-controls{ flex-direction:column; align-items:flex-start; gap:16px; margin-bottom:32px; }
+    #toggleAllBtn{ align-self:flex-start; }
+    .service-head{ padding:16px 18px; }
+    .svc-right{ width:100%; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .svc-body{ padding:0 18px 20px; }
+
+    /* SKILLS */
+    .skill-grid{ grid-template-columns:1fr 1fr; gap:12px; }
+
+    /* CONTACT */
+    .contact-panel{ padding:40px 28px; }
+    .contact-links{ flex-direction:column; align-items:center; }
+    .contact-links .btn{ width:100%; justify-content:center; max-width:320px; }
+  }
+
+  /* ═══════════════════════════════════════
+     RESPONSIVE — MOBILE  ≤ 480px
+  ═══════════════════════════════════════ */
+  @media(max-width:480px){
+    .wrap{ padding:0 16px; }
+
+    /* NAV */
+    nav .wrap{ height:56px; }
+    .nav-brand{ font-size:12px; }
+    .nav-brand .glyph{ width:22px; height:22px; font-size:11px; }
+    .nav-cta{ padding:7px 12px; font-size:11px; }
+
+    /* HERO */
+    header.hero{ padding:40px 0 36px; }
+    .status-bar{ display:none; } /* too cluttered on very small screens */
+    h1.name{ font-size:clamp(32px,9vw,48px); margin-bottom:14px; }
+    .role-line{ font-size:12px; }
+    .role-line .pipe{ margin:0 4px; }
+    .hero-desc{ font-size:14px; margin-bottom:28px; }
+    .hero-actions{ flex-direction:column; gap:10px; margin-bottom:36px; }
+    .btn{ width:100%; justify-content:center; padding:14px 20px; }
+
+    /* METRICS */
+    .metric-strip{ grid-template-columns:1fr 1fr; border-radius:10px; }
+    .metric{ padding:16px 14px; }
+    .metric .num{ font-size:22px; }
+    .metric .label{ font-size:11px; }
+
+    /* SECTIONS */
+    section{ padding:48px 0; }
+    section.tight{ padding:36px 0; }
+    .sec-head h2{ font-size:clamp(24px,6vw,32px); }
+    .sec-head p{ font-size:14px; }
+
+    /* EXPERIENCE */
+    .exp-controls{ gap:12px; margin-bottom:24px; }
+    .service-head{ padding:14px 16px; gap:10px; }
+    .service-id{ gap:12px; }
+    .logo-slot{ width:38px; height:38px; font-size:7.5px; }
+    .svc-meta .company{ font-size:15px; }
+    .svc-meta .role{ font-size:11px; }
+    .svc-right{ font-size:11px; gap:8px; }
+    .badge-live{ padding:3px 8px; font-size:10.5px; }
+    .svc-body{ padding:0 14px 18px; }
+    .project-title{ font-size:13.5px; }
+    ul.bullets li{ font-size:13.5px; }
+
+    /* SKILLS */
+    .skill-grid{ grid-template-columns:1fr; gap:10px; }
+    .skill-card{ padding:16px; }
+
+    /* CONTACT */
+    .contact-panel{ padding:32px 16px; border-radius:12px; }
+
+    /* FOOTER */
+    footer{ padding:28px 0 80px; } /* extra bottom for terminal button */
+    footer p{ font-size:10.5px; }
+
+    /* TERMINAL BUTTON — smaller on mobile */
+    #termBtn{ bottom:20px; right:16px; padding:9px 14px; font-size:12px; border-radius:8px; }
+  }
+
+  /* ═══════════════════════════════════════
+     TERMINAL — MOBILE FULLSCREEN
+  ═══════════════════════════════════════ */
+  @media(max-width:640px){
+    #termOverlay{ align-items:flex-end; }
+    #termWindow{
+      width:100%; height:70vh;
+      border-radius:16px 16px 0 0;
+      border-bottom:none;
+      animation:tSlideUp .25s ease;
+    }
+    @keyframes tSlideUp{ from{transform:translateY(100%);opacity:0;} to{transform:none;opacity:1;} }
+    #termBody{ font-size:12px; padding:12px 14px; }
+    #termInput{ font-size:12px; }
+    .tprompt{ font-size:12px; }
+
+    /* PAC-MAN — scale canvas to fit screen */
+    #pacWindow{ width:100vw; border-radius:0; border-left:none; border-right:none; }
+    #pacContent{ padding:12px 12px 16px; }
+    #pacCanvas{ width:100% !important; height:auto !important; }
+    #pacHud{ font-size:11px; gap:16px; flex-wrap:wrap; justify-content:center; }
+  }
+
+  /* ── Touch: hide custom cursor on touch-primary devices ── */
+  @media(hover:none) and (pointer:coarse){
+    #cursor-dot, #cursor-ring, #cursor-trail{ display:none !important; }
+    *, *::before, *::after{ cursor:auto !important; }
+    html, body{ cursor:auto !important; }
   }
 </style>
 </head>
@@ -513,8 +648,11 @@
               <span class="tag">Helm</span><span class="tag">K3S</span>
             </div>
             <ul class="bullets">
-              <li>Architect and tech lead took the platform from whiteboard to production, orchestrating multiple AI models for real-time context-aware positioning.</li>
-              <li>Architected an event-driven layer with MQTT and ZeroMQ, enabling low-latency interaction between distributed components at the edge.</li>
+              <li>Led the design and development of a platform enabling the integration and orchestration of multiple AI models for context-aware positioning use cases.</li>
+              <li>Architected backend services using FastAPI and PostgreSQL to support scalable and high-performance API operations.</li>
+              <li>Designed an event-driven communication architecture using MQTT and ZeroMQ for real-time interaction between distributed platform components.</li>
+              <li>Built containerized deployment workflows using Docker, Helm, and Kubernetes (K3S) for edge and IoT environments.</li>
+              <li>Owned end-to-end delivery including architecture, implementation and deployment.</li>
               <li><strong>Reduced API latency by 40%</strong> and optimised throughput to support <strong>4× more camera streams</strong> per edge device.</li>
             </ul>
           </div>
@@ -526,9 +664,11 @@
               <span class="tag">Kubernetes</span><span class="tag">Helm</span>
             </div>
             <ul class="bullets">
-              <li>Led a full-stack platform for application lifecycle management, deployment, monitoring, and ops at enterprise scale.</li>
-              <li>Built a ReactJS management console as the unified operator interface across services.</li>
-              <li>Integrated Kubernetes, Helm, and ArgoCD into a GitOps pipeline, reducing manual deployment steps.</li>
+              <li>Led development of a platform for application lifecycle management, enabling deployment, monitoring, and management of distributed applications.</li>
+              <li>Developed backend services using Node.js, Spring Boot, and Python to support deployment orchestration and operational workflows.</li>
+              <li>Built a ReactJS-based management console providing a unified interface for platform operations.</li>
+              <li>Integrated Kubernetes, Helm, MQTT, and ArgoCD to streamline application deployment and management processes.</li>
+              <li>Collaborated with cross-functional stakeholders to deliver platform capabilities supporting enterprise-scale application management.</li>
             </ul>
           </div>
         </div>
@@ -563,9 +703,11 @@
               <span class="tag">MongoDB</span><span class="tag">Apache</span>
             </div>
             <ul class="bullets">
-              <li>Built a centralised authentication platform as a reusable plugin for enterprise applications.</li>
-              <li>Migrated core services from Express.js to NestJS for improved modularity and maintainability.</li>
-              <li>Configured Apache for routing, load balancing, and secure SSL termination.</li>
+              <li>Developed a centralized authentication and security platform designed to integrate with enterprise applications as a reusable plugin.</li>
+              <li>Built scalable backend services using Express.js and later migrated core services to NestJS to improve maintainability and extensibility.</li>
+              <li>Designed and implemented frontend modules using ReactJS.</li>
+              <li>Configured Apache web servers for routing, load balancing, and secure application access.</li>
+              <li>Participated in system design, implementation, testing, and deployment activities.</li>
             </ul>
           </div>
         </div>
@@ -600,9 +742,13 @@
               <span class="tag">Azure</span><span class="tag">PostgreSQL</span><span class="tag">Oracle DB</span>
             </div>
             <ul class="bullets">
-              <li>Built backend services and APIs for telecom customers across <strong>India and Europe</strong>.</li>
-              <li>Developed customer-facing apps and reusable ReactJS component libraries.</li>
-              <li>Managed deployment and scaling of infrastructure on Microsoft Azure, including secure VPN connectivity to on-prem environments.</li>
+              <li>Developed enterprise applications, APIs, and automation utilities for telecom customers across India and Europe.</li>
+              <li>Built backend services using Java Spring Boot and Node.js to support provisioning and operational workflows.</li>
+              <li>Developed customer-facing web applications and reusable UI components using ReactJS and JavaScript.</li>
+              <li>Managed deployment, scaling, and operational support of application and database infrastructure on Microsoft Azure.</li>
+              <li>Established secure connectivity between cloud-hosted services and customer on-premises environments.</li>
+              <li>Supported application deployment, server administration, monitoring, and troubleshooting activities across multiple environments.</li>
+              <li>Worked with PostgreSQL, MariaDB, and Oracle databases for application development and maintenance.</li>
             </ul>
           </div>
         </div>
@@ -814,7 +960,17 @@ updateToggleBtn();
       <div id="pacHud">
         <span>SCORE: <strong id="pacScore">0</strong></span>
         <span>LIVES: <strong id="pacLives">3</strong></span>
-        <span id="pacMsg">Press ENTER to start</span>
+        <span id="pacMsg">Tap ▶ to start</span>
+      </div>
+      <!-- Touch D-pad (mobile only) -->
+      <div id="dpad">
+        <button class="dp" id="dp-up"   aria-label="Up">▲</button>
+        <div class="dp-row">
+          <button class="dp" id="dp-left"  aria-label="Left">◀</button>
+          <button class="dp dp-start" id="dp-start" aria-label="Start">▶</button>
+          <button class="dp" id="dp-right" aria-label="Right">▶</button>
+        </div>
+        <button class="dp" id="dp-down"  aria-label="Down">▼</button>
       </div>
     </div>
   </div>
@@ -893,13 +1049,34 @@ updateToggleBtn();
   animation:tSlide .22s ease;
 }
 #pacContent{display:flex;flex-direction:column;align-items:center;padding:16px;gap:12px;}
-#pacCanvas{border:1px solid #1C262E;border-radius:6px;display:block;}
+#pacCanvas{border:1px solid #1C262E;border-radius:6px;display:block;max-width:100%;}
 #pacHud{
   font-family:'JetBrains Mono',monospace;font-size:12px;color:#8B98A3;
   display:flex;gap:28px;align-items:center;
 }
 #pacHud strong{color:#5EEAD4;}
 #pacMsg{color:#D4A056;}
+/* D-pad */
+#dpad{
+  display:none; flex-direction:column; align-items:center; gap:4px;
+  user-select:none; -webkit-user-select:none;
+}
+.dp-row{ display:flex; gap:4px; align-items:center; }
+.dp{
+  width:52px; height:52px; border-radius:10px;
+  background:#131A20; border:1px solid #26313A;
+  color:#5EEAD4; font-size:18px;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .1s, border-color .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.dp:active{ background:#1C2E3A; border-color:#5EEAD4; }
+.dp-start{
+  background:#1C2E3A; border-color:#5EEAD4;
+  color:#FFD700; font-size:20px; width:52px; height:52px;
+}
+@media(max-width:640px){ #dpad{ display:flex; } }
+@media(min-width:641px){ #dpad{ display:none !important; } }
 </style>
 
 <script>
@@ -1134,7 +1311,7 @@ updateToggleBtn();
       if(now < g.timer) return;
       g.timer = now + (g.fr ? GHOST_MS[i]*1.4 : GHOST_MS[i]);
       // Pick next step
-      let [ndx,ndy] = [0,0];
+      let [ndx,ndy]=[0,0];
       if(g.fr){
         // Frightened: BFS away from pac (maximise distance)
         const choices=DIRS4.filter(([dx,dy])=>{
@@ -1258,6 +1435,43 @@ updateToggleBtn();
 
   closeBtn.addEventListener('click',close);
   modal.addEventListener('click',e=>{if(e.target===modal)close();});
+
+  // Touch D-pad wiring
+  function hookDpad(id,nx,ny){
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('touchstart',e=>{
+      e.preventDefault(); e.stopPropagation();
+      if(state==='waiting'||state==='dead'||state==='won'){
+        if(state==='waiting'){state='running';msgEl.textContent='';}
+        else{init();state='running';msgEl.textContent='';}
+      }
+      pac.nx=nx; pac.ny=ny;
+    },{passive:false});
+  }
+  hookDpad('dp-up',   0,-1);
+  hookDpad('dp-down', 0, 1);
+  hookDpad('dp-left',-1, 0);
+  hookDpad('dp-right',1, 0);
+  // Start button
+  const dpStart=document.getElementById('dp-start');
+  if(dpStart) dpStart.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(state==='waiting'){state='running';msgEl.textContent='';}
+    else if(state==='dead'||state==='won'){init();state='running';msgEl.textContent='';}
+  },{passive:false});
+
+  // Swipe on canvas
+  let swipeX=0,swipeY=0;
+  canvas.addEventListener('touchstart',e=>{ swipeX=e.touches[0].clientX; swipeY=e.touches[0].clientY; },{passive:true});
+  canvas.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-swipeX, dy=e.changedTouches[0].clientY-swipeY;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<20) return;
+    if(Math.abs(dx)>Math.abs(dy)){ pac.nx=dx>0?1:-1; pac.ny=0; }
+    else{ pac.nx=0; pac.ny=dy>0?1:-1; }
+    if(state==='waiting'){state='running';msgEl.textContent='';}
+  },{passive:true});
+
   window.openPacMan=open;
 })();
 </script>
