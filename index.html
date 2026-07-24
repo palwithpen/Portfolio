@@ -511,6 +511,41 @@
     html, body{ cursor:auto !important; }
   }
 </style>
+
+<script>
+/* ── DYNAMIC EXPERIENCE COUNTER ── */
+(function(){
+  const START = new Date(2019, 6, 11); // 11 July 2019 (month is 0-indexed)
+
+  function calc(){
+    const now = new Date();
+    let y = now.getFullYear() - START.getFullYear();
+    let m = now.getMonth()    - START.getMonth();
+    if (now.getDate() < START.getDate()) m--;
+    if (m < 0){ y--; m += 12; }
+    return { years:y, months:m };
+  }
+
+  // "7.0" → years.months
+  window.expString = function(){
+    const {years, months} = calc();
+    return years + '.' + months;
+  };
+
+  // "7 yr 0 mo" — alternate format if you prefer it anywhere
+  window.expLong = function(){
+    const {years, months} = calc();
+    return years + ' yr ' + months + ' mo';
+  };
+
+  function paint(){
+    document.querySelectorAll('[data-exp]').forEach(el => el.textContent = window.expString());
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
+  else paint();
+})();
+</script>
 </head>
 <body>
 
@@ -536,7 +571,7 @@
     <div class="status-bar">
       <span class="seg"><span class="status-ok">●</span> all systems operational</span>
       <span class="sep">/</span>
-      <span class="seg">uptime: 6+ years</span>
+      <span class="seg">uptime: <span data-exp></span> years</span>
       <span class="sep">/</span>
       <span class="seg">region: bengaluru-in</span>
     </div>
@@ -548,7 +583,7 @@
     </div>
 
     <p class="hero-desc">
-      Platform and distributed systems engineer with <strong>6+ years</strong> of end-to-end ownership from architecture to production across telecom, AI, and enterprise domains. I design event-driven microservices and run them on Kubernetes at the edge, where latency and reliability actually matter.
+      Platform and distributed systems engineer with <strong><span data-exp></span> years</strong> of end-to-end ownership from architecture to production across telecom, AI, and enterprise domains. I design event-driven microservices and run them on Kubernetes at the edge, where latency and reliability actually matter.
     </p>
 
     <div class="hero-actions">
@@ -558,7 +593,7 @@
     </div>
 
     <div class="metric-strip">
-      <div class="metric reveal"><span class="num">6+</span><span class="label">years in production systems</span></div>
+      <div class="metric reveal"><span class="num" data-exp></span><span class="label">years in production systems</span></div>
       <div class="metric reveal"><span class="num">40%</span><span class="label">latency reduction shipped</span></div>
       <div class="metric reveal"><span class="num">4×</span><span class="label">edge device throughput gain</span></div>
       <div class="metric reveal"><span class="num">4</span><span class="label">companies, zero gaps</span></div>
@@ -1093,7 +1128,7 @@ updateToggleBtn();
   const CMDS={
     help:()=>`<span class="t-amber t-bold">Available commands</span>\n  <span class="t-teal">whoami</span>           about Pallav\n  <span class="t-teal">skills</span>           tech stack\n  <span class="t-teal">experience</span>       career timeline\n  <span class="t-teal">contact</span>          get in touch\n  <span class="t-teal">stack</span>            favourite tools\n  <span class="t-teal">uptime</span>           years in the industry\n  <span class="t-teal">kubectl get pods</span> running services\n  <span class="t-teal">docker ps</span>        container list\n  <span class="t-teal">ls projects</span>      key projects\n  <span class="t-teal">cat readme</span>       fun facts\n  <span class="t-teal">pacman</span>           launch Pac-Man 🕹\n  <span class="t-teal">clear</span>            clear screen\n  <span class="t-teal">exit</span>             close terminal`,
 
-    whoami:()=>`<span class="t-white t-bold">Pallav Gupta</span>\n  Senior Software Engineer · Platform Lead\n  📍 Bengaluru, IN  |  6+ years shipping cloud-native platforms\n  🎓 B.E. Mechanical → self-taught software engineer\n  💼 HCL Software (current) · Nokia · Infosys · TCS`,
+    whoami:()=>`<span class="t-white t-bold">Pallav Gupta</span>\n  Senior Software Engineer · Platform Lead\n  📍 Bengaluru, IN  |  ${window.expString()} years shipping cloud-native platforms\n  🎓 B.E. Mechanical → self-taught software engineer\n  💼 HCL Software (current) · Nokia · Infosys · TCS`,
 
     skills:()=>`<span class="t-amber t-bold">Tech Stack</span>\n  <span class="t-teal">Languages :</span> Python, JavaScript, Java, Shell\n  <span class="t-teal">Backend   :</span> FastAPI, Node.js, Express, NestJS, Spring Boot\n  <span class="t-teal">Frontend  :</span> ReactJS, HTML5, CSS3\n  <span class="t-teal">Cloud     :</span> Docker, Kubernetes, K3S, Helm, ArgoCD, Azure\n  <span class="t-teal">Messaging :</span> MQTT, ZeroMQ, HTTP/2, REST, JWT\n  <span class="t-teal">Databases :</span> PostgreSQL, MongoDB, ClickHouse, MariaDB, Oracle`,
 
@@ -1104,8 +1139,7 @@ updateToggleBtn();
     stack:()=>`<span class="t-amber t-bold">Daily toolkit</span>\n  Editor  : VS Code + Vim keybindings\n  Shell   : zsh + oh-my-zsh\n  OS      : Ubuntu / RHEL in prod, macOS for dev\n  Orch    : Kubernetes (K3S at the edge)\n  Msg     : MQTT for IoT, ZeroMQ for in-process\n  DB      : PostgreSQL first; MongoDB when schema is fluid`,
 
     uptime:()=>{
-      const yrs=((Date.now()-new Date('2019-07-01'))/(1000*60*60*24*365.25)).toFixed(1);
-      return `<span class="t-teal t-bold">System uptime: ${yrs} years</span>\n  Started  : July 2019 (TCS)\n  Current  : HCL Software\n  Status   : <span class="t-teal">● all systems operational</span>`;
+      return `<span class="t-teal t-bold">System uptime: ${window.expString()} years</span>\n  Started  : 11 July 2019 (TCS)\n  Current  : HCL Software\n  Status   : <span class="t-teal">● all systems operational</span>`;
     },
 
     'kubectl get pods':()=>`<span class="t-amber">NAME                           READY  STATUS      RESTARTS</span>\n  hcl-augmented-network-auto     1/1    <span class="t-teal">Running</span>     0\n  nokia-ai-positioning-platform  1/1    <span class="t-teal">Running</span>     0\n  nokia-app-mgmt-platform        1/1    <span class="t-teal">Running</span>     0\n  infosys-auth-system            0/1    Completed   0\n  tcs-telecom-infra              0/1    Completed   0\n<span class="t-dim">  5 pods · 2 running · 3 completed</span>`,
@@ -1477,3 +1511,4 @@ updateToggleBtn();
 </script>
 
 </body>
+</html>
