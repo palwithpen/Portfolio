@@ -225,6 +225,50 @@
   }
   #toggleAllBtn:hover{ border-color:var(--violet); color:var(--violet); }
 
+  /* Grafana-style state-timeline panel summarizing the whole career at a glance */
+  .uptime-panel{
+    border:1px solid var(--line); border-radius:12px;
+    background:var(--bg-card); padding:20px 24px 18px; margin-bottom:20px;
+  }
+  .uptime-head{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px; margin-bottom:14px;
+    font-family:var(--mono); font-size:12px;
+  }
+  .uptime-label{ color:var(--text-dim); }
+  .uptime-range{ color:var(--text-faint); margin-left:6px; }
+  .uptime-status{ display:flex; align-items:center; gap:6px; color:var(--cyan); }
+  .uptime-status .dot{ width:5px; height:5px; border-radius:50%; background:var(--cyan); animation:pulse 2.4s ease-in-out infinite; }
+
+  .uptime-bar{
+    display:flex; width:100%; height:26px; border-radius:5px; overflow:hidden;
+    background:#0A0F1E; border:1px solid var(--line-soft); gap:2px; padding:2px;
+  }
+  .uptime-seg{
+    position:relative; min-width:14px; height:100%; border-radius:3px;
+    border:none; cursor:pointer; transition:filter .2s, transform .2s;
+  }
+  .uptime-seg:hover{ filter:brightness(1.25); transform:scaleY(1.06); }
+  .uptime-seg:focus-visible{ outline:2px solid var(--violet); outline-offset:2px; }
+  .seg-1{ background:rgba(124,92,255,.32); }
+  .seg-2{ background:rgba(124,92,255,.5); }
+  .seg-3{ background:rgba(124,92,255,.78); }
+  .seg-4{ background:var(--cyan); box-shadow:0 0 12px rgba(62,214,200,.45); }
+  .uptime-pulse{
+    position:absolute; inset:0; border-radius:3px;
+    background:var(--cyan); animation:uptimePulse 2s ease-out infinite;
+  }
+  @keyframes uptimePulse{
+    0%{ box-shadow:0 0 0 0 rgba(62,214,200,.55); }
+    100%{ box-shadow:0 0 0 8px rgba(62,214,200,0); }
+  }
+  .uptime-ticks{
+    display:flex; margin-top:8px;
+    font-family:var(--mono); font-size:10.5px; color:var(--text-faint);
+  }
+  .uptime-ticks span{ flex:1; text-align:left; }
+  .uptime-ticks span:last-child{ text-align:right; color:var(--cyan); }
+
   /* The rack — two side rails holding every role as a mounted unit */
   .rack{
     position:relative; border:1px solid var(--line); border-radius:12px;
@@ -324,30 +368,118 @@
   .service-card.open .acc-wrap{ grid-template-rows:1fr; }
   .acc-inner{ overflow:hidden; }
 
-  .svc-body{ padding:0 22px 24px; }
-  .svc-divider{ border:none; border-top:1px solid var(--line-soft); margin:0 0 20px; }
-  .svc-loc{ font-family:var(--mono); font-size:12px; color:var(--text-faint); margin-bottom:18px; }
+  .svc-body{ padding:0 22px 22px; }
+  .svc-divider{ border:none; border-top:1px solid var(--line-soft); margin:0 0 16px; }
+  .svc-loc{ font-family:var(--mono); font-size:11.5px; color:var(--text-faint); margin-bottom:14px; }
 
-  .project-block{ margin-bottom:22px; }
+  .project-block{ margin-bottom:16px; }
   .project-block:last-child{ margin-bottom:0; }
-  .project-title{
-    font-weight:700; font-size:15px; color:var(--text); margin-bottom:7px;
-    display:flex; align-items:center; gap:8px; font-family:var(--sans);
-  }
-  .project-title::before{ content:"›"; color:var(--violet); font-family:var(--mono); font-size:16px; }
-  .stack-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
   .tag{
     font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
     background:var(--bg-raised); border:1px solid var(--line-soft);
     padding:3px 9px; border-radius:3px;
   }
-  ul.bullets{ list-style:none; }
-  ul.bullets li{
-    position:relative; padding-left:20px; margin-bottom:9px;
-    font-size:14.5px; color:var(--text-dim); line-height:1.65; font-family:var(--sans);
+
+  /* One bordered panel per project — title/prompt header, log lines, stack footer.
+     Keeping it to a single box (instead of separate title/tags/feed pieces) is what
+     stops the section from reading as a stack of disjoint fragments. */
+  .log-feed{
+    background:#0A0F1E; border:1px solid var(--line-soft); border-radius:8px;
+    overflow:hidden;
   }
-  ul.bullets li::before{ content:"▸"; position:absolute; left:0; color:var(--violet); font-size:11px; top:4px; }
-  ul.bullets li strong{ color:var(--text); font-weight:600; }
+  .log-feed-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    flex-wrap:wrap; padding:11px 14px; border-bottom:1px solid var(--line-soft);
+    background:rgba(124,92,255,.04);
+  }
+  .project-title{
+    font-weight:700; font-size:14px; color:var(--text); font-family:var(--sans);
+    display:flex; align-items:center; gap:7px;
+  }
+  .project-title::before{ content:"›"; color:var(--violet); font-family:var(--mono); font-size:15px; }
+  .log-prompt{ font-family:var(--mono); font-size:10.5px; color:var(--text-faint); }
+  .log-prompt::before{ content:"$ "; color:var(--violet); }
+
+  .log-line{
+    display:flex; align-items:baseline; gap:12px;
+    padding:6px 14px; transition:background .15s;
+  }
+  .log-line:hover{ background:rgba(124,92,255,.06); }
+  .log-ts{ font-family:var(--mono); font-size:11px; color:var(--text-faint); flex-shrink:0; width:52px; }
+  .log-level{
+    font-family:var(--mono); font-weight:700; font-size:10px; letter-spacing:.04em;
+    flex-shrink:0; width:50px;
+  }
+  .log-level.lvl-info{ color:var(--text-dim); }
+  .log-level.lvl-deploy{ color:var(--violet); }
+  .log-level.lvl-metric{ color:var(--cyan); text-shadow:0 0 6px rgba(62,214,200,.3); }
+  .log-msg{ font-family:var(--sans); font-size:13px; color:var(--text-dim); line-height:1.5; }
+  .log-msg .log-key{ font-family:var(--mono); color:var(--text); font-weight:600; }
+  .log-msg strong{ color:var(--text); font-weight:600; }
+
+  .log-stack{
+    display:flex; gap:8px; padding:9px 14px; margin-top:2px;
+    border-top:1px solid var(--line-soft);
+    font-family:var(--mono); font-size:10.5px; color:var(--text-faint);
+  }
+  .log-stack .log-stack-label{ color:var(--text-faint); flex-shrink:0; }
+  .log-stack .log-stack-items{ color:var(--text-dim); }
+
+  @media(max-width:480px){
+    .log-line{ flex-wrap:wrap; gap:4px 12px; }
+    .log-msg{ flex:1 1 100%; margin-top:2px; }
+    .log-feed-head{ padding:10px 12px; }
+    .log-prompt{ display:none; }
+  }
+
+  /* Write-up toggle — one per tile, second-level disclosure kept collapsed by
+     default so the log feed stays the primary, low-noise view. */
+  .detail-toggle{
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    width:100%; margin-top:14px; padding:10px 14px;
+    font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+    background:transparent; border:1px dashed var(--line-soft); border-radius:6px;
+    cursor:pointer; transition:color .2s, border-color .2s, background .2s;
+  }
+  .detail-toggle:hover{ color:var(--violet); border-color:var(--violet-dim); background:rgba(124,92,255,.04); }
+  .detail-toggle svg{ width:11px; height:11px; flex-shrink:0; transition:transform .3s cubic-bezier(.4,0,.2,1); }
+  .detail-toggle[aria-expanded="true"]{ color:var(--violet); border-color:var(--violet-dim); border-style:solid; border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:0; }
+  .detail-toggle[aria-expanded="true"] svg{ transform:rotate(180deg); }
+
+  .detail-wrap{
+    display:grid; grid-template-rows:0fr;
+    transition:grid-template-rows .35s cubic-bezier(.4,0,.2,1);
+  }
+  .detail-wrap.open{ grid-template-rows:1fr; }
+  .detail-inner{ overflow:hidden; }
+  .detail-panel{
+    padding:16px 16px 4px; border:1px solid var(--violet-dim); border-top:none;
+    border-radius:0 0 6px 6px; background:rgba(124,92,255,.03);
+  }
+  .detail-block{ margin-bottom:14px; }
+  .detail-block:last-child{ margin-bottom:0; }
+  .detail-block-title{
+    font-family:var(--mono); font-size:10.5px; color:var(--text-faint);
+    text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;
+  }
+  .detail-text{ padding-bottom:12px; }
+  .detail-block:not(:last-child) .detail-text{ border-bottom:1px dashed var(--line-soft); }
+  .detail-list{ list-style:none; }
+  .detail-list li{
+    position:relative; padding-left:18px; margin-bottom:10px;
+    font-family:var(--sans); font-size:13.5px; color:var(--text-dim); line-height:1.6;
+  }
+  .detail-list li:last-child{ margin-bottom:0; }
+  .detail-list li::before{
+    content:"›"; position:absolute; left:0; top:0;
+    color:var(--violet); font-family:var(--mono); font-size:13px;
+  }
+
+  @media(max-width:480px){
+    .detail-toggle{ font-size:11px; padding:9px 12px; }
+    .detail-panel{ padding:14px 14px 2px; }
+    .detail-text{ font-size:13px; }
+  }
 
   @media(max-width:640px){
     .rack{ border-radius:8px; padding:0 16px; background:
@@ -479,6 +611,8 @@
     /* EXPERIENCE */
     .exp-controls{ flex-direction:column; align-items:flex-start; gap:16px; margin-bottom:32px; }
     #toggleAllBtn{ align-self:flex-start; }
+    .uptime-panel{ padding:16px 18px; }
+    .uptime-ticks span:not(:first-child):not(:last-child){ display:none; }
     .service-head{ padding:16px 18px; }
     .svc-right{ width:100%; justify-content:space-between; flex-wrap:wrap; gap:8px; }
     .svc-body{ padding:0 18px 20px; }
@@ -529,6 +663,9 @@
 
     /* EXPERIENCE */
     .exp-controls{ gap:12px; margin-bottom:24px; }
+    .uptime-panel{ padding:14px 14px 12px; margin-bottom:16px; }
+    .uptime-head{ font-size:11px; }
+    .uptime-bar{ height:22px; }
     .service-head{ padding:14px 16px; gap:10px; }
     .service-id{ gap:12px; }
     .logo-slot{ width:38px; height:38px; font-size:7.5px; }
@@ -538,7 +675,9 @@
     .badge-live{ padding:3px 8px; font-size:10.5px; }
     .svc-body{ padding:0 14px 18px; }
     .project-title{ font-size:13.5px; }
-    ul.bullets li{ font-size:13.5px; }
+    .log-msg{ font-size:12.5px; }
+    .log-ts{ width:44px; }
+    .log-level{ width:44px; font-size:9.5px; }
 
     /* SKILLS */
     .skill-grid{ grid-template-columns:1fr; gap:10px; }
@@ -684,15 +823,31 @@
   <div class="wrap">
     <div class="exp-controls">
       <div class="sec-head">
-        <h2>Professional Experience <span class="dwg-tag"><span class="led"></span>4 nodes, chronological</span></h2>
-        <p>Four roles, rack-mounted top to bottom. Headline's always on — click a unit for the full spec.</p>
+        <h2>Professional Experience <span class="dwg-tag"><span class="led"></span>4 services, 1 uptime</span></h2>
+        <p>Career rendered as a status monitor. Green means live — click a segment or a unit for the full spec.</p>
       </div>
       <button id="toggleAllBtn" type="button">Expand all ↓</button>
     </div>
 
+    <div class="uptime-panel reveal">
+      <div class="uptime-head">
+        <span class="uptime-label">📊 service_history <span class="uptime-range">2019 — now</span></span>
+        <span class="uptime-status"><span class="dot"></span> all systems operational</span>
+      </div>
+      <div class="uptime-bar">
+        <button class="uptime-seg seg-1" data-jump="U01" style="flex-grow:29" aria-label="Tata Consultancy Services, Jul 2019 to Dec 2021"></button>
+        <button class="uptime-seg seg-2" data-jump="U02" style="flex-grow:4"  aria-label="Infosys, Dec 2021 to Apr 2022"></button>
+        <button class="uptime-seg seg-3" data-jump="U03" style="flex-grow:48" aria-label="Nokia, Apr 2022 to Apr 2026"></button>
+        <button class="uptime-seg seg-4 live" data-jump="U04" style="flex-grow:6" aria-label="HCL Software, Apr 2026 to present, current role"><span class="uptime-pulse"></span></button>
+      </div>
+      <div class="uptime-ticks">
+        <span>TCS</span><span>Infosys</span><span>Nokia</span><span>HCL — current</span>
+      </div>
+    </div>
+
     <div class="rack">
     <!-- ── HCL ── open by default -->
-    <div class="service-card reveal open" data-card>
+    <div class="service-card reveal open" data-card id="U04">
       <span class="unit-no">U04</span>
       <button class="service-head" data-toggle aria-expanded="true">
         <div class="service-top">
@@ -718,24 +873,38 @@
           <hr class="svc-divider">
           <div class="svc-loc">📍 Bengaluru, IN</div>
           <div class="project-block">
-            <div class="project-title">Augmented Network Automation</div>
-            <div class="stack-tags">
-              <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">ClickHouse</span>
-              <span class="tag">MQTT</span><span class="tag">ZeroMQ</span><span class="tag">Docker</span>
-              <span class="tag">Helm</span><span class="tag">K3S</span><span class="tag">HTTP/2</span>
+            <div class="log-feed">
+              <div class="log-feed-head">
+                <span class="project-title">Augmented Network Automation</span>
+                <span class="log-prompt">journalctl -u augmented-network-automation -f</span>
+              </div>
+              <div class="log-line"><span class="log-ts">2026-04</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">migration</span> — Bitbucket → GitLab for <strong>75+ engineers</strong>, zero CI/CD disruption</span></div>
+              <div class="log-line"><span class="log-ts">2026-05</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">persistence</span> — ClickHouse → MongoDB, new ORM integrations for query flexibility</span></div>
+              <div class="log-line"><span class="log-ts">2026-06</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">infra</span> — containerized cloud-native services on K3S via Helm charts</span></div>
+              <div class="log-stack"><span class="log-stack-label">stack</span><span class="log-stack-items">Python · FastAPI · ClickHouse · MQTT · ZeroMQ · Docker · Helm · K3S · HTTP/2</span></div>
             </div>
-            <ul class="bullets">
-              <li>Owned migration of source repositories from Bitbucket to GitLab for a <strong>75+ engineer team</strong>, maintaining zero disruption to CI/CD pipelines.</li>
-              <li>Led database modernization migrating the persistence layer from ClickHouse to MongoDB, building new ORM integrations for improved query flexibility.</li>
-              <li>Designed and deployed containerized cloud-native services on Kubernetes (K3S) using Helm charts, improving deployment repeatability across environments.</li>
-            </ul>
           </div>
+          <button class="detail-toggle" type="button" data-detail-toggle aria-expanded="false" aria-controls="detail-U04">
+            <span class="detail-toggle-label">Read the full write-up</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="detail-wrap" id="detail-U04"><div class="detail-inner">
+            <div class="detail-panel">
+              <div class="detail-block">
+                <div class="detail-text"><ul class="detail-list">
+                  <li>Ran the Bitbucket-to-GitLab migration for 6 teams and 75+ engineers, planning the cutover so CI/CD pipelines and release cadence kept running with zero downtime.</li>
+                  <li>Separately, migrated the persistence layer from ClickHouse to MongoDB and introduced a new ORM, giving us more flexible queries and a data model that stayed maintainable as the product grew.</li>
+                  <li>Also set up one-click, Helm-based deployment on Kubernetes (K3S), which cut deployment time in half with releases that were finally repeatable across every environment.</li>
+                </ul></div>
+              </div>
+            </div>
+          </div></div>
         </div>
       </div></div>
     </div>
 
     <!-- ── Nokia ── collapsed -->
-    <div class="service-card reveal" data-card>
+    <div class="service-card reveal" data-card id="U03">
       <span class="unit-no">U03</span>
       <button class="service-head" data-toggle aria-expanded="false">
         <div class="service-top">
@@ -761,42 +930,64 @@
           <hr class="svc-divider">
           <div class="svc-loc">📍 Bengaluru, IN</div>
           <div class="project-block">
-            <div class="project-title">Context-Aware AI Positioning Platform</div>
-            <div class="stack-tags">
-              <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">PostgreSQL</span>
-              <span class="tag">MQTT</span><span class="tag">ZeroMQ</span><span class="tag">Docker</span>
-              <span class="tag">Helm</span><span class="tag">K3S</span>
+            <div class="log-feed">
+              <div class="log-feed-head">
+                <span class="project-title">Context-Aware AI Positioning Platform</span>
+                <span class="log-prompt">journalctl -u ai-positioning-platform -f</span>
+              </div>
+              <div class="log-line"><span class="log-ts">2022-06</span><span class="log-level lvl-info">INFO</span><span class="log-msg"><span class="log-key">role.start</span> — leading design + end-to-end delivery of a multi-model AI positioning platform</span></div>
+              <div class="log-line"><span class="log-ts">2023-02</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">backend</span> — FastAPI + PostgreSQL APIs, event-driven MQTT/ZeroMQ messaging</span></div>
+              <div class="log-line"><span class="log-ts">2023-09</span><span class="log-level lvl-metric">METRIC</span><span class="log-msg"><span class="log-key">inference</span> — multi-model serving on NVIDIA Triton, <strong>60% faster</strong> model onboarding</span></div>
+              <div class="log-line"><span class="log-ts">2024-02</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">infra</span> — containerized workflows on Docker, Helm, K3S for edge and IoT</span></div>
+              <div class="log-line"><span class="log-ts">2025-08</span><span class="log-level lvl-metric">METRIC</span><span class="log-msg"><span class="log-key">perf</span> — <strong>API latency ↓40%</strong>, <strong>4× more camera streams</strong> per edge device</span></div>
+              <div class="log-stack"><span class="log-stack-label">stack</span><span class="log-stack-items">Python · FastAPI · PostgreSQL · MQTT · ZeroMQ · Docker · Helm · K3S · HTTP/2</span></div>
             </div>
-            <ul class="bullets">
-              <li>Led the design and development of a platform enabling the integration and orchestration of multiple AI models for context-aware positioning use cases.</li>
-              <li>Architected backend services using FastAPI and PostgreSQL to support scalable and high-performance API operations.</li>
-              <li>Designed an event-driven communication architecture using MQTT and ZeroMQ for real-time interaction between distributed platform components.</li>
-              <li>Built containerized deployment workflows using Docker, Helm, and Kubernetes (K3S) for edge and IoT environments.</li>
-              <li>Owned end-to-end delivery including architecture, implementation and deployment.</li>
-              <li><strong>Reduced API latency by 40%</strong> and optimised throughput to support <strong>4× more camera streams</strong> per edge device.</li>
-            </ul>
           </div>
           <div class="project-block">
-            <div class="project-title">Application Management Platform</div>
-            <div class="stack-tags">
-              <span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">Spring Boot</span>
-              <span class="tag">ReactJS</span><span class="tag">PostgreSQL</span><span class="tag">ArgoCD</span>
-              <span class="tag">Kubernetes</span><span class="tag">Helm</span>
+            <div class="log-feed">
+              <div class="log-feed-head">
+                <span class="project-title">Application Management Platform</span>
+                <span class="log-prompt">journalctl -u application-management-platform -f</span>
+              </div>
+              <div class="log-line"><span class="log-ts">2023-08</span><span class="log-level lvl-info">INFO</span><span class="log-msg"><span class="log-key">role.start</span> — self-service platform for teams to upload, deploy, and run apps without a central ops team</span></div>
+              <div class="log-line"><span class="log-ts">2024-06</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">stack</span> — Node.js/Spring Boot/Python backend, ReactJS console, MQTT telemetry</span></div>
+              <div class="log-line"><span class="log-ts">2025-02</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">security</span> — image scanner on every upload, blocking malicious containers before they run</span></div>
+              <div class="log-line"><span class="log-ts">2025-11</span><span class="log-level lvl-metric">METRIC</span><span class="log-msg"><span class="log-key">onboarding</span> — GitOps pipeline on Kubernetes/Helm/ArgoCD, app onboarding time <strong>↓90%</strong></span></div>
+              <div class="log-stack"><span class="log-stack-label">stack</span><span class="log-stack-items">Node.js · Express.js · Spring Boot · Python · ReactJS · PostgreSQL · MQTT · ArgoCD · Kubernetes · Helm</span></div>
             </div>
-            <ul class="bullets">
-              <li>Led development of a platform for application lifecycle management, enabling deployment, monitoring, and management of distributed applications.</li>
-              <li>Developed backend services using Node.js, Spring Boot, and Python to support deployment orchestration and operational workflows.</li>
-              <li>Built a ReactJS-based management console providing a unified interface for platform operations.</li>
-              <li>Integrated Kubernetes, Helm, MQTT, and ArgoCD to streamline application deployment and management processes.</li>
-              <li>Collaborated with cross-functional stakeholders to deliver platform capabilities supporting enterprise-scale application management.</li>
-            </ul>
           </div>
+          <button class="detail-toggle" type="button" data-detail-toggle aria-expanded="false" aria-controls="detail-U03">
+            <span class="detail-toggle-label">Read the full write-up</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="detail-wrap" id="detail-U03"><div class="detail-inner">
+            <div class="detail-panel">
+              <div class="detail-block">
+                <div class="detail-block-title">Context-Aware AI Positioning Platform</div>
+                <div class="detail-text"><ul class="detail-list">
+                  <li>The idea was to let several AI models work together on context-aware positioning instead of leaning on any single model's output.</li>
+                  <li>I owned it end to end: the architecture, a FastAPI and PostgreSQL backend sized for high-throughput API traffic, and an event-driven layer on MQTT and ZeroMQ so edge components could react in real time instead of polling.</li>
+                  <li>Added multi-model inference serving on NVIDIA Triton behind an API, so the team could onboard any new AI model and get it deployed 60% faster than before.</li>
+                  <li>Once it was packaged in Docker, Helm, and K3S for edge deployment, the optimizations paid off directly: API latency dropped 40%, and each edge device could handle 4× more camera streams than before.</li>
+                </ul></div>
+              </div>
+              <div class="detail-block">
+                <div class="detail-block-title">Application Management Platform</div>
+                <div class="detail-text"><ul class="detail-list">
+                  <li>This was a self-service platform so teams could upload, deploy, and run their own applications at enterprise scale without waiting on a central ops team.</li>
+                  <li>I led the build of a console for that, a Node.js/Spring Boot/Python backend with a ReactJS frontend, and surfaced real-time health and telemetry over MQTT so teams could see what was actually happening across their nodes.</li>
+                  <li>Added a security check that scanned every uploaded container image and blocked malicious ones before they could run.</li>
+                  <li>Replaced the hardcoded setup with a GitOps-driven pipeline on Kubernetes, Helm, and ArgoCD, which brought application onboarding time down by 90%.</li>
+                </ul></div>
+              </div>
+            </div>
+          </div></div>
         </div>
       </div></div>
     </div>
 
     <!-- ── Infosys ── collapsed -->
-    <div class="service-card reveal" data-card>
+    <div class="service-card reveal" data-card id="U02">
       <span class="unit-no">U02</span>
       <button class="service-head" data-toggle aria-expanded="false">
         <div class="service-top">
@@ -822,25 +1013,40 @@
           <hr class="svc-divider">
           <div class="svc-loc">📍 Bengaluru, IN</div>
           <div class="project-block">
-            <div class="project-title">Common Authentication System</div>
-            <div class="stack-tags">
-              <span class="tag">ReactJS</span><span class="tag">Node.js</span><span class="tag">NestJS</span>
-              <span class="tag">MongoDB</span><span class="tag">Apache</span>
+            <div class="log-feed">
+              <div class="log-feed-head">
+                <span class="project-title">Common Authentication System</span>
+                <span class="log-prompt">journalctl -u common-authentication-system -f</span>
+              </div>
+              <div class="log-line"><span class="log-ts">2021-12</span><span class="log-level lvl-info">INFO</span><span class="log-msg"><span class="log-key">role.start</span> — centralized auth platform, built as a reusable plugin for enterprise apps</span></div>
+              <div class="log-line"><span class="log-ts">2022-01</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">auth</span> — token-based authentication and authorization with JWT for every integrating service</span></div>
+              <div class="log-line"><span class="log-ts">2022-02</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">backend</span> — Express.js migrated to NestJS, ReactJS frontend, Apache routing + SSL termination</span></div>
+              <div class="log-line"><span class="log-ts">2022-04</span><span class="log-level lvl-info">INFO</span><span class="log-msg"><span class="log-key">delivery</span> — system design, implementation, testing, deployment</span></div>
+              <div class="log-stack"><span class="log-stack-label">stack</span><span class="log-stack-items">ReactJS · Node.js · Express.js · NestJS · MongoDB · Apache · Shell Scripting</span></div>
             </div>
-            <ul class="bullets">
-              <li>Developed a centralized authentication and security platform designed to integrate with enterprise applications as a reusable plugin.</li>
-              <li>Built scalable backend services using Express.js and later migrated core services to NestJS to improve maintainability and extensibility.</li>
-              <li>Designed and implemented frontend modules using ReactJS.</li>
-              <li>Configured Apache web servers for routing, load balancing, and secure application access.</li>
-              <li>Participated in system design, implementation, testing, and deployment activities.</li>
-            </ul>
           </div>
+          <button class="detail-toggle" type="button" data-detail-toggle aria-expanded="false" aria-controls="detail-U02">
+            <span class="detail-toggle-label">Read the full write-up</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="detail-wrap" id="detail-U02"><div class="detail-inner">
+            <div class="detail-panel">
+              <div class="detail-block">
+                <div class="detail-text"><ul class="detail-list">
+                  <li>Infosys wanted a single sign-on layer that enterprise apps could just drop in instead of rebuilding auth every time, so I built it as a reusable plugin.</li>
+                  <li>Implemented token-based authentication and authorization with JWT, giving every integrating service a standard way to verify users and enforce access.</li>
+                  <li>Started with Express.js and later moved core services to NestJS once the codebase got big enough that the extra structure actually paid off, with a ReactJS frontend for the auth screens.</li>
+                  <li>Configured Apache for routing, load balancing, and SSL termination across environments.</li>
+                </ul></div>
+              </div>
+            </div>
+          </div></div>
         </div>
       </div></div>
     </div>
 
     <!-- ── TCS ── collapsed -->
-    <div class="service-card reveal" data-card>
+    <div class="service-card reveal" data-card id="U01">
       <span class="unit-no">U01</span>
       <button class="service-head" data-toggle aria-expanded="false">
         <div class="service-top">
@@ -866,21 +1072,34 @@
           <hr class="svc-divider">
           <div class="svc-loc">📍 Gandhinagar, IN</div>
           <div class="project-block">
-            <div class="project-title">Telecom Solutions &amp; Cloud Infrastructure</div>
-            <div class="stack-tags">
-              <span class="tag">Node.js</span><span class="tag">ReactJS</span><span class="tag">Spring Boot</span>
-              <span class="tag">Azure</span><span class="tag">PostgreSQL</span><span class="tag">Oracle DB</span>
+            <div class="log-feed">
+              <div class="log-feed-head">
+                <span class="project-title">Telecom Solutions &amp; Cloud Infrastructure</span>
+                <span class="log-prompt">journalctl -u telecom-solutions -f</span>
+              </div>
+              <div class="log-line"><span class="log-ts">2019-08</span><span class="log-level lvl-info">INFO</span><span class="log-msg"><span class="log-key">role.start</span> — enterprise apps, APIs, automation utilities for telecom customers, India + Europe</span></div>
+              <div class="log-line"><span class="log-ts">2020-03</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">app</span> — Spring Boot + Node.js backend, reusable ReactJS component libraries shared across teams</span></div>
+              <div class="log-line"><span class="log-ts">2020-11</span><span class="log-level lvl-deploy">DEPLOY</span><span class="log-msg"><span class="log-key">infra</span> — Azure deployment/scaling + secure ExpressRoute VPN to on-prem</span></div>
+              <div class="log-line"><span class="log-ts">2021-07</span><span class="log-level lvl-info">INFO</span><span class="log-msg"><span class="log-key">ops</span> — server administration, monitoring, troubleshooting across PostgreSQL, MariaDB, Oracle</span></div>
+              <div class="log-stack"><span class="log-stack-label">stack</span><span class="log-stack-items">Node.js · ReactJS · Spring Boot · Azure · PostgreSQL · MariaDB · Oracle DB · Shell Scripting</span></div>
             </div>
-            <ul class="bullets">
-              <li>Developed enterprise applications, APIs, and automation utilities for telecom customers across India and Europe.</li>
-              <li>Built backend services using Java Spring Boot and Node.js to support provisioning and operational workflows.</li>
-              <li>Developed customer-facing web applications and reusable UI components using ReactJS and JavaScript.</li>
-              <li>Managed deployment, scaling, and operational support of application and database infrastructure on Microsoft Azure.</li>
-              <li>Established secure connectivity between cloud-hosted services and customer on-premises environments.</li>
-              <li>Supported application deployment, server administration, monitoring, and troubleshooting activities across multiple environments.</li>
-              <li>Worked with PostgreSQL, MariaDB, and Oracle databases for application development and maintenance.</li>
-            </ul>
           </div>
+          <button class="detail-toggle" type="button" data-detail-toggle aria-expanded="false" aria-controls="detail-U01">
+            <span class="detail-toggle-label">Read the full write-up</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="detail-wrap" id="detail-U01"><div class="detail-inner">
+            <div class="detail-panel">
+              <div class="detail-block">
+                <div class="detail-text"><ul class="detail-list">
+                  <li>Across telecom clients in India and Europe, I built and ran enterprise applications and the automation utilities that supported them, mixing Spring Boot and Node.js on the backend.</li>
+                  <li>Built reusable ReactJS component libraries that several teams shared, which sped up frontend work across products instead of everyone rebuilding the same pieces.</li>
+                  <li>A good chunk of the job was infrastructure work: deploying and scaling on Microsoft Azure, and setting up secure ExpressRoute VPN connectivity back to customers' on-premises systems.</li>
+                  <li>I was also the person who got paged when something needed monitoring or troubleshooting across our PostgreSQL, MariaDB, and Oracle-backed services.</li>
+                </ul></div>
+              </div>
+            </div>
+          </div></div>
         </div>
       </div></div>
     </div>
@@ -992,10 +1211,33 @@ function updateToggleBtn(){
   toggleAllBtn.textContent = allOpen ? 'Collapse all ↑' : 'Expand all ↓';
 }
 
+/* ── UPTIME PANEL — click a segment to open + scroll to its card ── */
+document.querySelectorAll('[data-jump]').forEach(seg => {
+  seg.addEventListener('click', () => {
+    const card = document.getElementById(seg.dataset.jump);
+    if(!card) return;
+    toggleCard(card, true);
+    updateToggleBtn();
+    card.scrollIntoView({ behavior:'smooth', block:'center' });
+  });
+});
+
 toggleAllBtn.addEventListener('click', () => {
   const allOpen = cards.every(c => c.classList.contains('open'));
   cards.forEach(c => toggleCard(c, !allOpen));
   updateToggleBtn();
+});
+
+/* ── PER-TILE WRITE-UP TOGGLE ── */
+document.querySelectorAll('[data-detail-toggle]').forEach(btn => {
+  const wrap = btn.nextElementSibling;
+  const label = btn.querySelector('.detail-toggle-label');
+  btn.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    wrap.classList.toggle('open', !open);
+    label.textContent = open ? 'Read the full write-up' : 'Hide the full write-up';
+  });
 });
 
 updateToggleBtn();
