@@ -1293,8 +1293,11 @@ updateToggleBtn();
   let W=0, H=0, DPR=1;
   let ambient=[], ambientEdges=[], anchors=[], anchorEdges=[], pulses=[];
   let mx=0.5, my=0.4, running=true;
+  let mouseX=0, mouseY=0, mouseActive=false;
 
   const ANCHOR_REL = [ [0.66,0.20], [0.86,0.42], [0.62,0.66], [0.34,0.86] ];
+  const PULL_RADIUS = 240;   // px within which stars start drifting toward the cursor
+  const PULL_EASE = 0.10;    // how quickly a pulled star chases its target each frame
 
   function rand(a,b){ return a + Math.random()*(b-a); }
 
@@ -1307,14 +1310,17 @@ updateToggleBtn();
     canvas.style.width = W+'px'; canvas.style.height = H+'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
 
-    const count = W < 640 ? 10 : (W < 1000 ? 16 : 22);
+    const count = W < 640 ? 16 : (W < 1000 ? 26 : 36);
     ambient = Array.from({length:count}, () => ({
       x: rand(0,W), y: rand(0,H),
       baseX:0, baseY:0,
       phase: rand(0, Math.PI*2),
       speed: rand(.4,.9),
       amp: rand(6,16),
-      r: rand(1.3,2.6),
+      r: rand(1,2.4),
+      twinklePhase: rand(0, Math.PI*2),
+      twinkleSpeed: rand(.6,1.4),
+      pull: 0,
     }));
     ambient.forEach(n=>{ n.baseX=n.x; n.baseY=n.y; });
 
@@ -1358,24 +1364,48 @@ updateToggleBtn();
     ctx.save();
     ctx.translate(offX,offY);
 
-    // ambient drift
-    if(!reduceMotion){
-      ambient.forEach(n=>{
-        n.x = n.baseX + Math.sin(t*0.001*n.speed + n.phase)*n.amp;
-        n.y = n.baseY + Math.cos(t*0.001*n.speed + n.phase)*n.amp*0.6;
-      });
-    }
+    // ambient drift + cursor pull — stars near the pointer ease toward it and
+    // cluster together, so several distinct points visually merge into one glow
+    ambient.forEach(n=>{
+      const wanderX = reduceMotion ? 0 : Math.sin(t*0.001*n.speed + n.phase)*n.amp;
+      const wanderY = reduceMotion ? 0 : Math.cos(t*0.001*n.speed + n.phase)*n.amp*0.6;
+      const baseX = n.baseX + wanderX, baseY = n.baseY + wanderY;
+      let targetX = baseX, targetY = baseY, pull = 0;
+
+      if(mouseActive){
+        const dx = mouseX - baseX, dy = mouseY - baseY;
+        const dist = Math.hypot(dx,dy);
+        if(dist < PULL_RADIUS){
+          pull = 1 - dist/PULL_RADIUS;
+          pull *= pull; // ease-in so the snap toward the cursor feels magnetic, not linear
+          targetX = baseX + dx*pull;
+          targetY = baseY + dy*pull;
+        }
+      }
+      n.pull = pull;
+      n.x += (targetX-n.x)*PULL_EASE;
+      n.y += (targetY-n.y)*PULL_EASE;
+    });
 
     // ambient mesh
     ctx.lineWidth = 1;
     ambientEdges.forEach(e=>{
       const a=ambient[e.a], b=ambient[e.b];
-      ctx.strokeStyle = 'rgba(124,92,255,.14)';
+      const glow = Math.max(a.pull,b.pull);
+      ctx.strokeStyle = `rgba(124,92,255,${(.14 + glow*.4).toFixed(3)})`;
       ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
     });
     ambient.forEach(n=>{
-      ctx.beginPath(); ctx.fillStyle='rgba(124,92,255,.5)';
-      ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fill();
+      const twinkle = reduceMotion ? .8 : .65 + Math.sin(t*0.002*n.twinkleSpeed + n.twinklePhase)*.35;
+      const r = n.r * (1 + n.pull*1.8) * twinkle;
+      if(n.pull > 0.05){
+        ctx.shadowColor = 'rgba(124,92,255,.9)';
+        ctx.shadowBlur = 4 + n.pull*16;
+      }
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(124,92,255,${Math.min(1, .5 + n.pull*.5).toFixed(3)})`;
+      ctx.arc(n.x,n.y,Math.max(0.4,r),0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
     });
 
     // anchor ties
@@ -1443,7 +1473,10 @@ updateToggleBtn();
   hero.addEventListener('mousemove', e=>{
     const r = hero.getBoundingClientRect();
     mx = (e.clientX-r.left)/r.width; my = (e.clientY-r.top)/r.height;
+    mouseX = e.clientX-r.left; mouseY = e.clientY-r.top;
+    mouseActive = true;
   }, {passive:true});
+  hero.addEventListener('mouseleave', ()=>{ mouseActive = false; }, {passive:true});
 
   const io = new IntersectionObserver(entries=>{
     entries.forEach(e=>{ running = e.isIntersecting; });
