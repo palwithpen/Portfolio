@@ -698,11 +698,8 @@
     .contact-panel{ padding:32px 16px; border-radius:12px; }
 
     /* FOOTER */
-    footer{ padding:28px 0 80px; } /* extra bottom for terminal button */
+    footer{ padding:28px 0 80px; } /* extra bottom for the koala mascot */
     footer p{ font-size:10.5px; }
-
-    /* TERMINAL BUTTON — smaller on mobile */
-    #termBtn{ bottom:20px; right:16px; padding:9px 14px; font-size:12px; border-radius:8px; }
   }
 
   /* ═══════════════════════════════════════
@@ -1556,17 +1553,8 @@ updateToggleBtn();
 })();
 </script>
 
-<!-- ███ TERMINAL LAUNCHER BUTTON ███ -->
-<button id="termBtn" title="Open terminal" aria-label="Open terminal">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <polyline points="4 17 10 11 4 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <line x1="12" y1="19" x2="20" y2="19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-  </svg>
-  terminal_
-</button>
-
 <!-- ███ KOALA MASCOT — peeks over the bottom-left corner ███ -->
-<div id="koala" role="button" tabindex="0" aria-label="Say hi to the koala">
+<div id="koala" role="button" tabindex="0" aria-label="Chat with the koala mascot">
   <div id="koalaBubble" aria-live="polite"></div>
   <svg viewBox="0 0 160 150" width="120" height="113" aria-hidden="true">
     <!-- laptop lid ledge the koala peeks over -->
@@ -1658,20 +1646,9 @@ updateToggleBtn();
 </div>
 
 <style>
-#termBtn{
-  position:fixed;bottom:28px;right:28px;z-index:1000;
-  background:#131A20;border:1px solid #26313A;
-  color:#6FE3A3;font-family:'JetBrains Mono',monospace;font-size:13px;
-  padding:11px 18px;border-radius:10px;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 4px 24px rgba(0,0,0,.4);
-  transition:border-color .2s,box-shadow .3s,transform .2s;
-}
-#termBtn:hover{border-color:#6FE3A3;box-shadow:0 0 20px rgba(111,227,163,.35);transform:translateY(-2px);}
-
 /* ── KOALA MASCOT ── */
 #koala{
-  position:fixed; left:20px; bottom:0; z-index:900;
+  position:fixed; right:36px; bottom:0; z-index:900;
   width:120px; height:auto; cursor:pointer;
   filter:drop-shadow(0 6px 18px rgba(0,0,0,.45));
 }
@@ -1685,21 +1662,33 @@ updateToggleBtn();
 #koala:focus-visible{ outline:2px solid var(--violet); outline-offset:4px; border-radius:12px; }
 
 #koalaBubble{
-  position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%) translateY(4px);
-  min-width:160px; max-width:220px; text-align:center;
+  position:absolute; right:0; bottom:calc(100% + 8px); transform:translateY(4px);
+  min-width:190px; max-width:230px; text-align:center;
   background:var(--bg-card); border:1px solid var(--line); border-radius:8px;
-  padding:8px 12px; font-family:var(--mono); font-size:11.5px; color:var(--text-dim);
+  padding:7px; font-family:var(--mono); font-size:11.5px; color:var(--text-dim);
   opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
 }
 #koalaBubble::after{
-  content:""; position:absolute; left:50%; top:100%; transform:translateX(-50%);
+  content:""; position:absolute; right:56px; top:100%;
   border:6px solid transparent; border-top-color:var(--line);
 }
-#koalaBubble.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+#koalaBubble.show{ opacity:1; pointer-events:auto; transform:translateY(0); }
+
+.koala-menu{ display:flex; flex-direction:column; gap:5px; }
+.koala-choice{
+  display:block; width:100%; text-align:left;
+  background:transparent; border:1px solid var(--line-soft); border-radius:5px;
+  padding:7px 10px; font-family:var(--mono); font-size:11px; color:var(--text);
+  cursor:pointer; transition:background .15s, border-color .15s, color .15s;
+}
+.koala-choice:hover, .koala-choice:focus-visible{ background:rgba(124,92,255,.08); border-color:var(--violet-dim); color:var(--violet); }
+.koala-text{ padding:5px 4px; text-align:center; line-height:1.5; }
 
 @media(max-width:480px){
-  #koala{ width:88px; left:14px; }
-  #koalaBubble{ font-size:10.5px; max-width:170px; }
+  #koala{ width:88px; right:20px; bottom:0; }
+  #koalaBubble{ font-size:10.5px; max-width:190px; }
+  #koalaBubble::after{ right:40px; }
+  .koala-choice{ font-size:10.5px; padding:6px 9px; }
 }
 
 #termOverlay{
@@ -1796,7 +1785,6 @@ updateToggleBtn();
 <script>
 /* ── TERMINAL ── */
 (function(){
-  const btn=document.getElementById('termBtn');
   const overlay=document.getElementById('termOverlay');
   const closeBtn=document.getElementById('termClose');
   const output=document.getElementById('termOutput');
@@ -1858,8 +1846,8 @@ updateToggleBtn();
   }
   function closeTerminal(){ overlay.classList.remove('open'); }
 
-  btn.addEventListener('click',openTerminal);
   closeBtn.addEventListener('click',closeTerminal);
+  window.openTerminal = openTerminal;
   overlay.addEventListener('click',e=>{ if(e.target===overlay) closeTerminal(); });
 
   input.addEventListener('keydown',e=>{
@@ -2188,24 +2176,24 @@ updateToggleBtn();
   window.openPacMan=open;
 })();
 
-/* ── KOALA MASCOT — idle blink, cursor-tracking eyes, click for a quip ── */
+/* ── KOALA MASCOT — idle blink, cursor-tracking eyes, click opens a menu ── */
 (function(){
   const koala = document.getElementById('koala');
   const bubble = document.getElementById('koalaBubble');
-  if(!koala || !bubble) return;
+  const svgEl = koala && koala.querySelector('svg');
+  if(!koala || !bubble || !svgEl) return;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const pupils = koala.querySelectorAll('.koala-pupil');
   const lids = koala.querySelectorAll('.koala-lid');
 
-  const QUIPS = [
-    'beep boop. still shipping.',
-    'checked the logs. all green.',
-    'psst, there is more below.',
-    'I run on eucalyptus and coffee.',
-    'not lurking, just reviewing PRs.',
-    '99 little bugs in the code...',
+  const JOKES = [
+    'Why do programmers prefer dark mode? Because light attracts bugs.',
+    "There are 10 kinds of people: those who understand binary, and those who don't.",
+    'I would tell you a UDP joke, but you might not get it.',
+    '99 little bugs in the code, 99 little bugs. Take one down, patch it around... 127 little bugs in the code.',
+    'A SQL query walks into a bar, sees two tables, and asks: "Can I join you?"',
   ];
-  let qi = 0;
+  let ji = 0;
 
   if(!reduceMotion){
     window.addEventListener('mousemove', e=>{
@@ -2227,16 +2215,43 @@ updateToggleBtn();
   }
 
   let hideTimer;
-  function sayQuip(){
-    bubble.textContent = QUIPS[qi % QUIPS.length];
-    qi++;
+  function showBubble(){
     bubble.classList.add('show');
     clearTimeout(hideTimer);
-    hideTimer = setTimeout(()=> bubble.classList.remove('show'), 3400);
   }
-  koala.addEventListener('click', sayQuip);
+  function openMenu(){
+    bubble.innerHTML =
+      '<div class="koala-menu">' +
+        '<button type="button" class="koala-choice" data-choice="joke">Wanna hear a joke?</button>' +
+        '<button type="button" class="koala-choice" data-choice="tech">Wanna try some techie stuff?</button>' +
+      '</div>';
+    showBubble();
+  }
+  function tellJoke(){
+    bubble.innerHTML = `<div class="koala-text">${JOKES[ji % JOKES.length]}</div>`;
+    ji++;
+    showBubble();
+    hideTimer = setTimeout(()=> bubble.classList.remove('show'), 5000);
+  }
+  function goTechie(){
+    bubble.classList.remove('show');
+    if(typeof window.openTerminal === 'function') window.openTerminal();
+  }
+
+  svgEl.addEventListener('click', openMenu);
   koala.addEventListener('keydown', e=>{
-    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); sayQuip(); }
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openMenu(); }
+  });
+  bubble.addEventListener('click', e=>{
+    const choice = e.target.closest('.koala-choice');
+    if(!choice) return;
+    if(choice.dataset.choice==='joke') tellJoke();
+    else if(choice.dataset.choice==='tech') goTechie();
+  });
+  document.addEventListener('click', e=>{
+    // composedPath (not e.target) survives the innerHTML swap tellJoke()/openMenu()
+    // do on click — e.target itself gets detached from the DOM before this fires.
+    if(!e.composedPath().includes(koala)) bubble.classList.remove('show');
   });
 })();
 </script>
