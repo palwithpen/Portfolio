@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A0E1A"/>
+      <stop offset="100%" stop-color="#0F1424"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7C5CFF"/>
+      <stop offset="100%" stop-color="#3ED6C8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- faint constellation dots, echoing the hero background -->
+  <g fill="#7C5CFF" opacity="0.35">
+    <circle cx="1040" cy="90" r="3"/>
+    <circle cx="1110" cy="150" r="2.5"/>
+    <circle cx="960" cy="60" r="2"/>
+    <circle cx="1140" cy="230" r="3"/>
+    <circle cx="1000" cy="260" r="2"/>
+  </g>
+  <g stroke="#7C5CFF" stroke-width="1" opacity="0.25">
+    <line x1="1040" y1="90" x2="1110" y2="150"/>
+    <line x1="1110" y1="150" x2="1140" y2="230"/>
+    <line x1="960" y1="60" x2="1040" y2="90"/>
+    <line x1="1000" y1="260" x2="1140" y2="230"/>
+  </g>
+
+  <!-- PG glyph badge -->
+  <rect x="80" y="86" width="92" height="92" rx="16" fill="#121830" stroke="#7C5CFF" stroke-width="2.5"/>
+  <text x="126" y="146" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="34" font-weight="700" fill="#3ED6C8" text-anchor="middle">PG</text>
+
+  <!-- name -->
+  <text x="80" y="288" font-family="'Chakra Petch', Arial, sans-serif" font-size="64" font-weight="700" fill="#E9ECF5">Pallav Gupta</text>
+
+  <!-- tagline -->
+  <text x="80" y="352" font-family="'Chakra Petch', Arial, sans-serif" font-size="42" font-weight="700" fill="#7C5CFF">builds platforms that don't go down.</text>
+
+  <!-- role line -->
+  <text x="80" y="404" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="22" fill="#8890AC">Senior Software Engineer  |  Platform Engineer  |  Distributed Systems</text>
+
+  <!-- divider -->
+  <rect x="80" y="452" width="1040" height="2" fill="#232B45"/>
+
+  <!-- metric strip -->
+  <g font-family="'JetBrains Mono', 'Courier New', monospace">
+    <text x="80" y="512" font-size="34" font-weight="700" fill="#3ED6C8">7+</text>
+    <text x="80" y="542" font-size="16" fill="#8890AC">years in production</text>
+
+    <text x="280" y="512" font-size="34" font-weight="700" fill="#3ED6C8">40%</text>
+    <text x="280" y="542" font-size="16" fill="#8890AC">latency reduction shipped</text>
+
+    <text x="520" y="512" font-size="34" font-weight="700" fill="#3ED6C8">4x</text>
+    <text x="520" y="542" font-size="16" fill="#8890AC">edge throughput gain</text>
+
+    <text x="720" y="512" font-size="34" font-weight="700" fill="#3ED6C8">4</text>
+    <text x="720" y="542" font-size="16" fill="#8890AC">companies, zero gaps</text>
+  </g>
+
+  <rect x="0" y="620" width="1200" height="10" fill="url(#accent)"/>
+</svg>
